@@ -5,7 +5,7 @@ import Home from './pages/Home';
 import Login from './pages/login'; 
 import Signup from './pages/signup';
 import CreateSchedule from './pages/CreateSchedule';
-//import WriteSchedule from './pages/WriteSchedule';
+import WriteSchedule from './pages/WriteSchedule';
 import ViewSchedule from './pages/ViewSchedule';
 
 
@@ -19,6 +19,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/create" element={<CreateSchedule />} /> {/* 근무표 생성 페이지 */}
         <Route path="/view" element={<ViewSchedule />} /> {/* 바로 ViewSchedule로 이동 */}
+        <Route path="/write" element={<WriteSchedule />} /> {/* 바로 ViewSchedule로 이동 */}
         {/* 추가적인 페이지를 여기에 등록할 수 있습니다 */}
       </Routes>
     </Router>
