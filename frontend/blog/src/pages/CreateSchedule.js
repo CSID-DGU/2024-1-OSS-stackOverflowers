@@ -1,99 +1,105 @@
-import React, { useState } from "react";
-import "./CreateSchedule.css";
+import React, { useState, useRef, useEffect } from "react";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
 
 const CreateSchedule = () => {
+  const [events, setEvents] = useState([]);
   const [startHour, setStartHour] = useState("09:00");
   const [endHour, setEndHour] = useState("23:00");
-  const [timeUnit, setTimeUnit] = useState(1); // 1시간 단위
-  const [selectedBlocks, setSelectedBlocks] = useState(new Set());
+  const [timeUnit, setTimeUnit] = useState(1); // 기본값을 1시간으로 설정
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const calendarRef = useRef(null);
 
-  const days = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
-  const allHours = Array.from({ length: 49 }, (_, i) => {
-    const hour = Math.floor(i / 2);
-    const minute = i % 2 === 0 ? "00" : "30";
-    return `${String(hour).padStart(2, '0')}:${minute}`;
-  });
-
-  const handleStartTimeChange = (e) => {
-    setStartHour(e.target.value);
-    // 종료 시간이 시작 시간보다 이전으로 설정되지 않도록 조정
-    if (e.target.value > endHour) {
-      setEndHour(e.target.value);
+  const handleEventAdd = (selectInfo) => {
+    const title = prompt("새 이벤트 제목을 입력하세요:");
+    if (title) {
+      const newEvent = {
+        id: String(Date.now()),
+        title,
+        start: selectInfo.start,
+        end: selectInfo.end,
+        allDay: false,
+      };
+      setEvents((prevEvents) => [...prevEvents, newEvent]);
     }
   };
 
-  const handleEndTimeChange = (e) => {
-    setEndHour(e.target.value);
-  };
-
-  const handleTimeUnitChange = (e) => {
-    setTimeUnit(Number(e.target.value));
-    
-    // 시간 단위가 1시간일 때, 시작 및 종료 시간을 1시간 단위로 설정
-    if (Number(e.target.value) === 1) {
-      const startHourRounded = Math.floor(parseInt(startHour.split(':')[0]) / 1) * 1;
-      const endHourRounded = Math.floor(parseInt(endHour.split(':')[0]) / 1) * 1 + (endHour.endsWith('30') ? 0.5 : 0);
-      setStartHour(`${String(startHourRounded).padStart(2, '0')}:00`);
-      setEndHour(`${String(endHourRounded).padStart(2, '0')}:00`);
+  const handleEventRemove = (clickInfo) => {
+    if (window.confirm("이 이벤트를 삭제하시겠습니까?")) {
+      clickInfo.event.remove();
+      setEvents((prevEvents) =>
+        prevEvents.filter((event) => event.id !== clickInfo.event.id)
+      );
     }
-  };
-
-  const handleSave = () => {
-    console.log("저장됨:", { startHour, endHour, timeUnit });
   };
 
   const handleReset = () => {
-    setSelectedBlocks(new Set());
+    setEvents([]);
   };
 
-  const toggleBlock = (day, hour) => {
-    const timeKey = `${day}-${hour}`;
-    const newSelectedBlocks = new Set(selectedBlocks);
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
 
-    if (newSelectedBlocks.has(timeKey)) {
-      newSelectedBlocks.delete(timeKey);
-    } else {
-      newSelectedBlocks.add(timeKey);
+  const handleEndDateChange = (e) => {
+    setEndDate(e.target.value);
+  };
+
+  useEffect(() => {
+    if (calendarRef.current && startDate && endDate) {
+      const calendarApi = calendarRef.current.getApi();
+      calendarApi.gotoDate(startDate);
+      calendarApi.setOption("visibleRange", {
+        start: startDate,
+        end: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString().split("T")[0],
+      });
     }
-
-    setSelectedBlocks(newSelectedBlocks);
-  };
-
-  const visibleHours = [];
-  const startIdx = allHours.indexOf(startHour);
-  const endIdx = allHours.indexOf(endHour);
-
-  for (let i = startIdx; i < endIdx; i += timeUnit === 1 ? 2 : 1) {
-    visibleHours.push(allHours[i]);
-  }
+  }, [startDate, endDate]);
 
   return (
     <div className="schedule-create-container">
-      <h1>근무표 작성</h1>
+      <h1>근무표 생성</h1>
       <p>근무 시작 시간, 종료 시간, 시간 단위를 설정하세요.</p>
-      
+
       <div className="time-setting">
         <label>
+          시작일:
+          <input
+            type="date"
+            value={startDate}
+            onChange={handleStartDateChange}
+          />
+        </label>
+
+        <label>
+          종료일:
+          <input
+            type="date"
+            value={endDate}
+            onChange={handleEndDateChange}
+          />
+        </label>
+
+        <label>
           근무 시작 시간:
-          <select value={startHour} onChange={handleStartTimeChange}>
-            {allHours.filter((hour) => {
-              // 1시간 단위일 때는 30분 단위 시간은 제외
-              return timeUnit === 1 ? hour.endsWith('00') : true;
-            }).map((hour) => (
+          <select
+            value={startHour}
+            onChange={(e) => setStartHour(e.target.value)}
+          >
+            {Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`).map((hour) => (
               <option key={hour} value={hour}>
                 {hour}
               </option>
             ))}
           </select>
         </label>
-        
+
         <label>
           근무 종료 시간:
-          <select value={endHour} onChange={handleEndTimeChange}>
-            {allHours.filter((hour) => {
-              // 1시간 단위일 때는 30분 단위 시간은 제외
-              return timeUnit === 1 ? hour.endsWith('00') : true;
-            }).map((hour) => (
+          <select value={endHour} onChange={(e) => setEndHour(e.target.value)}>
+            {Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`).map((hour) => (
               <option key={hour} value={hour}>
                 {hour}
               </option>
@@ -103,40 +109,53 @@ const CreateSchedule = () => {
 
         <label>
           시간 단위:
-          <select value={timeUnit} onChange={handleTimeUnitChange}>
+          <select value={timeUnit} onChange={(e) => setTimeUnit(Number(e.target.value))}>
             <option value={1}>1시간</option>
             <option value={0.5}>30분</option>
           </select>
         </label>
 
-        <button onClick={handleSave} className="save-button">
-          저장
+        <button onClick={handleReset} className="reset-button">
+          초기화
         </button>
-        <button onClick={handleReset}>초기화</button>
       </div>
 
-      <div className="schedule-grid">
-        <div className="grid-header">
-          <div className="time-label"></div>
-          {days.map((day, index) => (
-            <div key={index} className="day-label">{day}</div>
-          ))}
-        </div>
-        {visibleHours.map((hour, index) => (
-          <div key={index} className={`time-row ${timeUnit === 0.5 ? 'half-hour' : ''}`}>
-            <div className="time-label">{hour}</div>
-            {days.map((day, dayIndex) => (
-              <div
-                key={`${dayIndex}-${index}`}
-                className={`time-block ${selectedBlocks.has(`${day}-${hour}`) ? 'selected' : ''}`}
-                style={{ height: timeUnit === 0.5 ? '15px' : '30px' }}
-                onMouseDown={() => toggleBlock(day, hour)}
-                onMouseEnter={(e) => e.buttons === 1 && toggleBlock(day, hour)}
-                onMouseUp={(e) => e.preventDefault()} 
-              ></div>
-            ))}
-          </div>
-        ))}
+      <div className="calendar-container">
+        {startDate && endDate ? (
+          <FullCalendar
+            ref={calendarRef}
+            plugins={[timeGridPlugin, interactionPlugin]}
+            initialView="timeGridWeek"
+            selectable={true}
+            editable={true}
+            events={events}
+            headerToolbar={{
+              left: "",
+              center: "title",
+              right: "",
+            }}
+            slotMinTime={startHour} // 시작 시간
+            slotMaxTime={endHour} // 종료 시간
+            slotDuration={`${timeUnit === 1 ? "01:00" : "00:30"}`} // 시간 단위
+            slotLabelInterval="00:30:00"
+            allDaySlot={false}
+            select={handleEventAdd}
+            eventClick={handleEventRemove}
+            initialDate={startDate}
+            visibleRange={{
+              start: startDate,
+              end: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString().split("T")[0],
+            }}
+            slotLabelFormat={{
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false, // 24시간 형식
+            }}
+            height="auto" // 높이를 자동으로 조절
+          />
+        ) : (
+          <p>캘린더를 보기 위해 시작일과 종료일을 모두 선택하세요.</p>
+        )}
       </div>
     </div>
   );
