@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "certifi": "^14.5.15",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "fullcalendar": "^6.1.15",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.3",
+    "nunjucks": "^3.2.4"
+  }
+}

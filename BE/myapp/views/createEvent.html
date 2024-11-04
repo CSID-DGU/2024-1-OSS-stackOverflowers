@@ -1,0 +1,26 @@
+<!-- views/createEvent.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>일정 생성하기</h2>
+    <form action="/events/create" method="post">
+        <div class="mb-3">
+            <label for="date" class="form-label">날짜</label>
+            <input type="date" id="date" name="date" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="start" class="form-label">시작 시간</label>
+            <input type="time" id="start" name="start" class="form-control" step="600" required>
+        </div>
+        <div class="mb-3">
+            <label for="end" class="form-label">종료 시간</label>
+            <input type="time" id="end" name="end" class="form-control" step="600" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">일정 설명</label>
+            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">일정 생성</button>
+    </form>
+
+{% endblock %}
