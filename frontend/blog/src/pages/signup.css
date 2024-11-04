@@ -1,0 +1,71 @@
+/* src/SignUp.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.signup-container {
+  width: 500px;
+  padding: 30px;
+  text-align: center;
+}
+
+.title {
+  color: #007bff;
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-field {
+  margin-bottom: 15px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.input-field::placeholder {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.radio-group {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 15px;
+}
+
+.radio-group label {
+  font-size: 16px;
+}
+
+.submit-button {
+  padding: 15px;
+  font-size: 18px;
+  background-color: #87ceeb; /* Sky blue */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #7ec0ee; /* Slightly darker sky blue */
+}
