@@ -1,14 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction'; // 인터랙션 플러그인
-import eventsData from './data/event.json'; // JSON 파일
+import interactionPlugin from '@fullcalendar/interaction';
+import eventsData from './data/event.json';
+import './nav_schedule.css';
 
 export default function WriteSchedule() {
   const calendarEl = useRef(null);
-  const [events, setEvents] = useState([]); // 외부 데이터로부터 불러온 이벤트
+  const [events, setEvents] = useState([]);
+  const [selectedOption, setSelectedOption] = useState('');
 
-  // JSON 데이터를 불러와서 상태에 저장
   useEffect(() => {
     const loadEvents = () => {
       const fetchedEvents = eventsData.map((event) => ({
@@ -16,9 +17,9 @@ export default function WriteSchedule() {
         start: new Date(event.startTime),
         end: new Date(event.endTime),
       }));
-      setEvents(fetchedEvents); // 이벤트 저장
+      setEvents(fetchedEvents);
     };
-    loadEvents(); // 이벤트 로드
+    loadEvents();
   }, []);
 
   const openPopup = (event) => {
@@ -62,6 +63,7 @@ export default function WriteSchedule() {
           <h2>근무 신청</h2>
           <p>시작 시간: ${event.start.toLocaleString()}</p>
           <p>종료 시간: ${event.end.toLocaleString()}</p>
+           <p>우선 순위: ${selectedOption ? selectedOption : '설정되지 않음'}</p>
           <div style="margin-top: 20px;">
             <button id="confirm">예</button>
             <button id="cancel">아니오</button>
@@ -80,13 +82,11 @@ export default function WriteSchedule() {
     `);
   };
 
-  // **이벤트를 클릭했을 때 호출**
   const handleEventClick = (info) => {
     console.log('Event clicked:', info.event);
-    openPopup(info.event); // 팝업 열기
+    openPopup(info.event);
   };
 
-  // **빈 타임 슬롯을 클릭했을 때 호출**
   const handleSlotClick = (info) => {
     console.log('Time slot clicked:', info.date);
 
@@ -97,25 +97,46 @@ export default function WriteSchedule() {
 
     if (clickedEvent) {
       console.log('Event found:', clickedEvent);
-      openPopup(clickedEvent); // 팝업 열기
+      openPopup(clickedEvent);
     } else {
       console.log('No event found in this time slot.');
     }
   };
 
   return (
-    <div style={{ height: '80vh', width: '90vw', margin: '0 auto' }}>
-      <FullCalendar
-        ref={calendarEl}
-        plugins={[timeGridPlugin, interactionPlugin]}
-        initialView="timeGridWeek"
-        height="80%"
-        headerToolbar={{ center: 'title' }}
-        slotDuration="00:30:00"
-        events={events}
-        dateClick={handleSlotClick}
-        eventClick={handleEventClick}
-      />
+    <div style={{ display: 'flex', height: '90vh', width: '90vh', margin: '0 auto' }}>
+      {/* Left Dropdown Menu */}
+      <div style={{ width: '180px', padding: '10px' }}>
+        <label htmlFor="scheduleDropdown">우선순위:</label>
+        <select
+          id="scheduleDropdown"
+          value={selectedOption}
+          onChange={(e) => setSelectedOption(e.target.value)}
+          style={{ width: '100%', marginTop: '10px', marginLeft: '3px' ,padding: '8px', height: '40px' }}
+        >
+          <option value="">근무시간 우선순위</option>
+          <option value="1순위">1순위</option>
+          <option value="2순위">2순위</option>
+          <option value="3순위">3순위</option>
+        </select>
+      </div>
+
+      {/* Calendar */}
+        <div style={{ flex: 1, paddingLeft: '10px', width: '100%' }}>
+    <FullCalendar
+      ref={calendarEl}
+      plugins={[timeGridPlugin, interactionPlugin]}
+      initialView="timeGridWeek"    // 세로 크기 100%
+         // 가로 크기 100%
+      headerToolbar={{ center: 'title' }}
+      slotDuration="00:30:00"
+      events={events}
+      height={"80%"}
+      width={"80%"}
+      dateClick={handleSlotClick}
+      eventClick={handleEventClick}
+    />
+  </div>
     </div>
   );
 }
