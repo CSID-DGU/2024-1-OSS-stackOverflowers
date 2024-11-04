@@ -15,6 +15,7 @@ html, body {
     text-align: center;
     padding: 100px;
   }
+  
   .icon-text {
     display: flex;
     align-items: center; /* 아이콘과 문구를 수직으로 중앙 정렬 */
