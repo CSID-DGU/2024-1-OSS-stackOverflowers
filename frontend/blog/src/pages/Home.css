@@ -19,6 +19,7 @@ html, body {
   .icon-text {
     display: flex;
     align-items: center; /* 아이콘과 문구를 수직으로 중앙 정렬 */
+    justify-content: center;
   }
   
   .icon {
@@ -35,7 +36,7 @@ html, body {
   
   .main-content p {
     font-size: 18px;
-    margin-top: 30px;
+    margin-top: 50px;
   }
   
   .cta-button {

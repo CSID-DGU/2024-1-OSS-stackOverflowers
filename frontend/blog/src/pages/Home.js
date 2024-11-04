@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
+import './nav_schedule.css';
 
 function Home() {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ function Home() {
   return (
     <div className="home-container">
       <header className="navbar">
-        <div className="logo">ShiftMate</div>
+        <div className="logo_home">ShiftMate</div>
         <nav>
           <ul className="nav-links">
             <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
@@ -24,9 +25,12 @@ function Home() {
       </header>
 
       <div className="main-content">
-        <h1>꾸준하고픈 개발자의 목표를 성취하는 공간</h1>
-        <p>ShiftMate에서 공정한 스케줄 관리를 통해 함께 성장하세요.</p>
+      <div className="icon-text">
+        <span className="icon">📅</span>
+        <h1>간편한 근무일정관리</h1>
       </div>
+      <p>ShiftMate에서 공정한 스케줄 관리를 통해 함께 성장하세요.</p>
+    </div>
 
       <footer className="footer">
         <p>© 2024 ShiftMate, All Rights Reserved.</p>
