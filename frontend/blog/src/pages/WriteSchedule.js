@@ -4,11 +4,13 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import eventsData from './data/event.json';
 import './nav_schedule.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function WriteSchedule() {
   const calendarEl = useRef(null);
   const [events, setEvents] = useState([]);
   const [selectedOption, setSelectedOption] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadEvents = () => {
@@ -63,7 +65,7 @@ export default function WriteSchedule() {
           <h2>근무 신청</h2>
           <p>시작 시간: ${event.start.toLocaleString()}</p>
           <p>종료 시간: ${event.end.toLocaleString()}</p>
-           <p>우선 순위: ${selectedOption ? selectedOption : '설정되지 않음'}</p>
+          <p>우선 순위: ${selectedOption ? selectedOption : '설정되지 않음'}</p>
           <div style="margin-top: 20px;">
             <button id="confirm">예</button>
             <button id="cancel">아니오</button>
@@ -104,39 +106,59 @@ export default function WriteSchedule() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '90vh', width: '90vh', margin: '0 auto' }}>
-      {/* Left Dropdown Menu */}
-      <div style={{ width: '180px', padding: '10px' }}>
-        <label htmlFor="scheduleDropdown">우선순위:</label>
-        <select
-          id="scheduleDropdown"
-          value={selectedOption}
-          onChange={(e) => setSelectedOption(e.target.value)}
-          style={{ width: '100%', marginTop: '10px', marginLeft: '3px' ,padding: '8px', height: '40px' }}
-        >
-          <option value="">근무시간 우선순위</option>
-          <option value="1순위">1순위</option>
-          <option value="2순위">2순위</option>
-          <option value="3순위">3순위</option>
-        </select>
-      </div>
+    <>
+    <header className="navbar">
+        <div className="logo_home">ShiftMate</div>
+        <nav>
+          <ul className="nav-links">
+            <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
+            <li><button className="main-button" onClick={() => navigate('/create')}>근무표 생성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/write')}>근무표 작성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/view')}>근무표 조회</button></li>
+          </ul>
+        </nav>
+        <div className="auth-buttons">
+          <button onClick={() => navigate('/login')}>로그인</button>
+            <button onClick={() => navigate('/signup')}>회원가입</button>
+        </div>
+      </header>
 
-      {/* Calendar */}
-        <div style={{ flex: 1, paddingLeft: '10px', width: '100%' }}>
-    <FullCalendar
-      ref={calendarEl}
-      plugins={[timeGridPlugin, interactionPlugin]}
-      initialView="timeGridWeek"    // 세로 크기 100%
-         // 가로 크기 100%
-      headerToolbar={{ center: 'title' }}
-      slotDuration="00:30:00"
-      events={events}
-      height={"80%"}
-      width={"80%"}
-      dateClick={handleSlotClick}
-      eventClick={handleEventClick}
-    />
-  </div>
-    </div>
+      {/* Main Content */}
+      <div className="main-content">
+        <div style={{ display: 'flex', height: '90vh', width: '90vh', margin: '0 auto' }}>
+          {/* Left Dropdown Menu */}
+          <div style={{ width: '180px', padding: '10px' }}>
+            <label htmlFor="scheduleDropdown">우선순위:</label>
+            <select
+              id="scheduleDropdown"
+              value={selectedOption}
+              onChange={(e) => setSelectedOption(e.target.value)}
+              style={{ width: '100%', marginTop: '10px', marginLeft: '3px', padding: '8px', height: '40px' }}
+            >
+              <option value="">근무시간 우선순위</option>
+              <option value="1순위">1순위</option>
+              <option value="2순위">2순위</option>
+              <option value="3순위">3순위</option>
+            </select>
+          </div>
+
+          {/* Calendar */}
+          <div style={{ flex: 1, paddingLeft: '10px', width: '100%' }}>
+            <FullCalendar
+              ref={calendarEl}
+              plugins={[timeGridPlugin, interactionPlugin]}
+              initialView="timeGridWeek"
+              headerToolbar={{ center: 'title' }}
+              slotDuration="00:30:00"
+              events={events}
+              height={"80%"}
+              width={"80%"}
+              dateClick={handleSlotClick}
+              eventClick={handleEventClick}
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
