@@ -10,66 +10,16 @@ html, body {
     min-height: 100vh;
   }
   
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #52b2d5;
-    padding: 20px 20px;
-  }
-  
-  .logo_home {
-    font-size: 30px;
-    font-style: bold;
-    color: white;
-  }
-  
-  .nav-links {
-    list-style: none;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 20px;
-  }
-
-  .nav-links li {
-    margin: 0 10px; /* 버튼 사이의 간격 설정 */
-  }
-  
-  .nav-links button {
-    margin-right: 20px;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 18px;
-    white-space: nowrap;
-  }
-
-  .auth-buttons {
-    display: flex; /* flexbox 사용 */
-    align-items: center;
-    
-  }
-
-  .auth-buttons button {
-    background-color: white;
-    color: #52b2d5;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    margin-left: 10px;
-    white-space: nowrap;
-  }
-  
   .main-content {
     flex-grow: 1;
     text-align: center;
     padding: 100px;
   }
+  
   .icon-text {
     display: flex;
     align-items: center; /* 아이콘과 문구를 수직으로 중앙 정렬 */
+    justify-content: center;
   }
   
   .icon {
@@ -86,7 +36,7 @@ html, body {
   
   .main-content p {
     font-size: 18px;
-    margin-top: 30px;
+    margin-top: 50px;
   }
   
   .cta-button {

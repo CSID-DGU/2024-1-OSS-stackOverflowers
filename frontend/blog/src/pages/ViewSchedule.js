@@ -33,30 +33,21 @@ export default function ViewSchedule() {
 return (
     <>
       {/* 네비게이션 바 */}
-      <nav className="nav_shedule_page">
-        <ul className="nav-links">
-          <li>
-            <button
-              className="main-button"
-              onClick={() => (window.location.href = '/home') }
-              style={{ fontSize: '28px' }}
-            >
-              홈
-            </button>
-          </li>
-          <li>
-            <button className="main-button" onClick={() => navigate('/create')} style={{ fontSize: '28px' }}>
-                근무표 생성
-            </button>
-          </li>
-          <li>
-            <button className="main-button" onClick={() => navigate('/write')} style={{ fontSize: '28px' }}>
-               근무표 작성
-            </button>
-          </li>
-        </ul>
-      </nav>
-
+      <header className="navbar">
+        <div className="logo_home">ShiftMate</div>
+        <nav>
+          <ul className="nav-links">
+            <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
+            <li><button className="main-button" onClick={() => navigate('/create')}>근무표 생성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/write')}>근무표 작성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/view')}>근무표 조회</button></li>
+          </ul>
+        </nav>
+        <div className="auth-buttons">
+          <button onClick={() => navigate('/login')}>로그인</button>
+            <button onClick={() => navigate('/signup')}>회원가입</button>
+        </div>
+      </header>
       {/* 메인 컨텐츠 */}
       <div style={{ height: '80vh', width: '90vw', margin: '0 auto' }}>
         <div

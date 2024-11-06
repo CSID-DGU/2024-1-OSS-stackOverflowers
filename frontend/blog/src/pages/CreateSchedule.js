@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import './nav_schedule.css';
 
 const CreateSchedule = () => {
   const [events, setEvents] = useState([]);
@@ -11,6 +13,7 @@ const CreateSchedule = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const calendarRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleEventAdd = (selectInfo) => {
     const title = prompt("새 이벤트 제목을 입력하세요:");
@@ -60,6 +63,21 @@ const CreateSchedule = () => {
 
   return (
     <div className="schedule-create-container">
+      <header className="navbar">
+        <div className="logo_home">ShiftMate</div>
+        <nav>
+          <ul className="nav-links">
+            <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
+            <li><button className="main-button" onClick={() => navigate('/create')}>근무표 생성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/write')}>근무표 작성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/view')}>근무표 조회</button></li>
+          </ul>
+        </nav>
+        <div className="auth-buttons">
+          <button onClick={() => navigate('/login')}>로그인</button>
+            <button onClick={() => navigate('/signup')}>회원가입</button>
+        </div>
+      </header>
       <h1>근무표 생성</h1>
       <p>근무 시작 시간, 종료 시간, 시간 단위를 설정하세요.</p>
 
@@ -125,7 +143,7 @@ const CreateSchedule = () => {
           <FullCalendar
             ref={calendarRef}
             plugins={[timeGridPlugin, interactionPlugin]}
-            initialView="timeGridWeek"
+            initialView="timeGrid"
             selectable={true}
             editable={true}
             events={events}

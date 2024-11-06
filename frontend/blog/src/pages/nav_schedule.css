@@ -1,17 +1,50 @@
 /* 네비게이션 바 스타일 */
-.nav_shedule_page {
-    position: fixed; /* 상단 고정 */
-    top: 0;
-    left: 0;
-    width: 100%; /* 전체 화면 너비 */
-    height: 100px; /* 고정된 높이 설정 */
-    display: flex;
-    justify-content: center; /* 가로 중앙 정렬 */
-    align-items: center; /* 세로 중앙 정렬 */
-    background-color: #52b2d5;
-    padding: 0 20px;
-    margin-bottom: 20px; /* 네비게이션 바 아래 여백 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-    z-index: 1000; /* 다른 요소보다 위에 배치 */
-  }
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #52b2d5;
+  padding: 20px 20px;
+}
+
+.logo_home {
+  font-size: 30px;
+  font-style: bold;
+  color: white;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 20px;
+}
+.nav-links li {
+  margin: 0 10px; /* 버튼 사이의 간격 설정 */
+}
+
+.nav-links button {
+  margin-right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  white-space: nowrap;
+}
+.auth-buttons {
+  display: flex; /* flexbox 사용 */
+  align-items: center;
+  
+}
+.auth-buttons button {
+  background-color: white;
+  color: #52b2d5;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+  white-space: nowrap;
+}
   
