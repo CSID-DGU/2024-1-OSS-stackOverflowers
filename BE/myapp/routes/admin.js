@@ -4,7 +4,7 @@ import Admin from '../models/Admin.js';
 const router = express.Router();
 
 // 관리자 메인 페이지
-router.get('/main', (req, res) => {
+router.get('/home', (req, res) => {
     // 세션 체크
     if (!req.session.userId || req.session.userType !== 'admin') {
         return res.redirect('/');
@@ -13,7 +13,7 @@ router.get('/main', (req, res) => {
 });
 
 // 로그인
-router.post('/login', async (req, res) => {
+router.post('/home/login', async (req, res) => {
     try {
         const { phone, password } = req.body;
         
@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
 });
 
 // 회원가입
-router.post('/signup', async (req, res) => {
+router.post('/home/signup', async (req, res) => {
     try {
         const { phone, password } = req.body;
         
