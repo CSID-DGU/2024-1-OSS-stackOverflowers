@@ -105,7 +105,50 @@ router.get('admin/events/all', async (req, res) => {
 });
 
 
-//
+//근무 신청 승인POST//
+router.post('/worker/events/approve/:requestId', async (req, res) => {
+    try {
+        // 승인할 신청서 조회
+        const requestToApprove = await ShiftRequest.findById(req.params.requestId);
+        if (!requestToApprove) {
+            return res.status(404).json({ message: 'Request not found' });
+        }
 
-// 
+        // 동일한 시간대에 신청된 근무자 목록 조회 (이미 승인된 신청자 포함)
+        const overlappingRequests = await ShiftRequest.find({
+            start: { $lt: requestToApprove.end },
+            end: { $gt: requestToApprove.start },
+            status: 'Approved'
+        });
+
+        // 만약 해당 시간대에 이미 근무자가 최대 인원에 도달한 경우
+        if (overlappingRequests.length >= MAX_WORKERS_PER_SHIFT) {
+            return res.status(400).json({ message: 'Maximum workers already assigned for this shift' });
+        }
+
+        // 근무 신청 승인
+        requestToApprove.status = 'Approved';
+        await requestToApprove.save();
+        res.status(200).json({ message: 'Request approved successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to approve request' });
+    }
+});
+
+// 근무 신청 거절 (POST)
+router.post('/worker/events/reject/:requestId', async (req, res) => {
+    try {
+        const request = await ShiftRequest.findByIdAndUpdate(req.params.requestId, { status: 'Rejected' });
+        if (!request) {
+            return res.status(404).json({ message: 'Request not found' });
+        }
+        res.status(200).json({ message: 'Request rejected successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to reject request' });
+    }
+});
+
+
 export default router;
