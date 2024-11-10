@@ -3,8 +3,9 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import eventsData from './data/event.json';
-import './nav_schedule.css';
+import './WriteSchedule.css';
 import { useNavigate } from 'react-router-dom';
+import koLocale from '@fullcalendar/core/locales/ko';
 
 export default function WriteSchedule() {
   const calendarEl = useRef(null);
@@ -13,47 +14,74 @@ export default function WriteSchedule() {
   const [appliedEvents, setAppliedEvents] = useState({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadEvents = () => {
-      const fetchedEvents = eventsData.map((event) => ({
-        id: `${event.startTime}-${event.endTime}`,
-        title: event.name,
-        start: new Date(event.startTime),
-        end: new Date(event.endTime),
-        backgroundColor: '#3788d8',
-        textColor: '#ffffff',
-      }));
-      setEvents(fetchedEvents);
-    };
-    loadEvents();
-  }, []);
-
-  const updateEventStatus = (eventId, priority = null) => {
-    setEvents(prevEvents =>
-      prevEvents.map(event => {
-        if (event.id === eventId) {
-          const originalName = event.title.split(' (')[0];
-          return {
-            ...event,
-            backgroundColor: priority ? '#808080' : '#3788d8',
-            textColor: '#ffffff',
-            title: priority ? `${originalName} (${priority})` : originalName,
-          };
-        }
-        return event;
-      })
-    );
-
-    if (priority) {
-      setAppliedEvents(prev => ({ ...prev, [eventId]: priority }));
-    } else {
-      setAppliedEvents(prev => {
-        const newState = { ...prev };
-        delete newState[eventId];
-        return newState;
-      });
-    }
+// useEffect 부분 수정
+useEffect(() => {
+  const loadEvents = () => {
+    const fetchedEvents = eventsData.map((event) => ({
+      id: `${event.startTime}-${event.endTime}`,
+      title: event.name,
+      start: new Date(event.startTime),
+      end: new Date(event.endTime),
+      backgroundColor: '#FFFFFF',    // 기본 흰색 배경
+      textColor: '#000000',         // 검정색 텍스트
+      borderColor: '#d1d1d1'        // 회색 테두리
+    }));
+    setEvents(fetchedEvents);
   };
+  loadEvents();
+}, []);
+
+// updateEventStatus 함수 수정
+const updateEventStatus = (eventId, priority = null) => {
+  setEvents(prevEvents =>
+    prevEvents.map(event => {
+      if (event.id === eventId) {
+        const originalName = event.title.split(' (')[0];
+        let backgroundColor;
+        let textColor;
+        
+        // 더 뚜렷한 색상 차이를 준 우선순위별 색상
+        switch(priority) {
+          case '1순위':
+            backgroundColor = '#003399'; // 매우 진한 파랑
+            textColor = '#FFFFFF';
+            break;
+          case '2순위':
+            backgroundColor = '#0066FF'; // 선명한 파랑
+            textColor = '#FFFFFF';
+            break;
+          case '3순위':
+            backgroundColor = '#66B2FF'; // 밝은 파랑
+            textColor = '#000000';       // 밝은 배경색에는 검정색 텍스트
+            break;
+          default:
+            backgroundColor = '#FFFFFF'; // 흰색 배경
+            textColor = '#000000';      // 검정색 텍스트
+            break;
+        }
+
+        return {
+          ...event,
+          backgroundColor,
+          textColor,
+          title: priority ? `${originalName} (${priority})` : originalName,
+          borderColor: '#d1d1d1'
+        };
+      }
+      return event;
+    })
+  );
+
+  if (priority) {
+    setAppliedEvents(prev => ({ ...prev, [eventId]: priority }));
+  } else {
+    setAppliedEvents(prev => {
+      const newState = { ...prev };
+      delete newState[eventId];
+      return newState;
+    });
+  }
+};
 
   const openCancelPopup = (event) => {
     const popupWidth = 400;
@@ -269,8 +297,13 @@ export default function WriteSchedule() {
               events={events}
               height={"80%"}
               width={"80%"}
+              allDaySlot={false}
               dateClick={handleSlotClick}
               eventClick={handleEventClick}
+              // Set locale to Korean
+              locale={koLocale}
+              // Disable today’s highlight
+              nowIndicator={false}
             />
           </div>
         </div>

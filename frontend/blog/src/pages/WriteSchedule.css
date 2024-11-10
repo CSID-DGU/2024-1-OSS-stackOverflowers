@@ -1,0 +1,66 @@
+/* 네비게이션 바 스타일 */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #52b2d5;
+    padding: 20px 20px;
+  }
+  
+  .logo_home {
+    font-size: 30px;
+    font-style: bold;
+    color: white;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  .nav-links li {
+    margin: 0 10px; 
+  }
+  
+  .nav-links button {
+    margin-right: 20px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    white-space: nowrap;
+  }
+  .auth-buttons {
+    display: flex;
+    align-items: center;
+    
+  }
+  .auth-buttons button {
+    background-color: white;
+    color: #52b2d5;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+    white-space: nowrap;
+  }
+    
+  .fc .fc-day {
+    background-color: #d3d3d3; 
+  }
+  
+  .fc-day-today {
+    background-color: #d3d3d3 !important; 
+  }
+  
+  .fc .fc-col-header-cell {
+    background-color: #ffffff !important; 
+  }
+
+.whiteBackground .fc-timegrid-slot {
+    background-color: #ffffff !important; 
+  }
+  
