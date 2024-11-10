@@ -20,7 +20,7 @@ const calendarEl = useRef(null);
   const fetchEvents = (fetchInfo, successCallback, failureCallback) => {
     try {
       const events = eventsData.map(event => ({
-        title: event.name,
+        title: `${event.worker}`, // 시간대와 근무자 이름을 줄 바꿈으로 표시
         start: event.startTime,
         end: event.endTime,
       }));
@@ -30,7 +30,7 @@ const calendarEl = useRef(null);
       console.error('Failed to load events:', error);
       failureCallback(error);
     }
-  };
+  };  
   
 return (
     <>
