@@ -4,6 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import './nav_schedule.css';
+import './CreateSchedule.css'
 
 const CreateSchedule = () => {
   const [events, setEvents] = useState([]);
@@ -124,7 +125,6 @@ const CreateSchedule = () => {
         </div>
       </header>
       <h1>근무표 생성</h1>
-      <p>근무 시작 시간, 종료 시간, 시간 단위를 설정하세요.</p>
 
       <div className="time-setting">
         <label>
@@ -188,79 +188,70 @@ const CreateSchedule = () => {
 
       <div className="calendar-container">
         {startDate && endDate ? (
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[timeGridPlugin, interactionPlugin]}
-            initialView="timeGrid"
-            selectable={true}
-            editable={true}
-            events={events}
-            headerToolbar={{
-              left: "",
-              center: "title",
-              right: "",
-            }}
-            slotMinTime={startHour} // 시작 시간
-            slotMaxTime={endHour} // 종료 시간
-            slotDuration={`${timeUnit === 1 ? "01:00" : "00:30"}`} // 시간 단위
-            slotLabelInterval="00:30:00"
-            allDaySlot={false}
-            select={handleEventAdd}
-            eventClick={handleEventRemove}
-            initialDate={startDate}
-            visibleRange={{
-              start: startDate,
-              end: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString().split("T")[0],
-            }}
-            slotLabelFormat={{
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false, // 24시간 형식
-            }}
-            height="auto" // 높이를 자동으로 조절
-          />
+          <>
+            <div className="deadline-container">
+              <label htmlFor="deadline">작성기한: </label>
+              <input type="date" id="deadline" name="deadline" />
+            </div>
+            <div className="calendar">
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[timeGridPlugin, interactionPlugin]}
+                initialView="timeGrid"
+                selectable={true}
+                editable={true}
+                events={events}
+                headerToolbar={{
+                  left: "",
+                  center: "title",
+                  right: "",
+                }}
+                slotMinTime={startHour} // 시작 시간
+                slotMaxTime={endHour} // 종료 시간
+                slotDuration={`${timeUnit === 1 ? "01:00" : "00:30"}`} // 시간 단위
+                slotLabelInterval="00:30:00"
+                allDaySlot={false}
+                select={handleEventAdd}
+                eventClick={handleEventRemove}
+                initialDate={startDate}
+                visibleRange={{
+                  start: startDate,
+                  end: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString().split("T")[0],
+                }}
+                slotLabelFormat={{
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false, // 24시간 형식
+                }}
+                height="auto" // 높이를 자동으로 조절
+              />
+            </div>
+
+            <div className="worker-section">
+              <label>
+                근무자 ID:
+                <input type="text" value={workerId} onChange={(e) => setWorkerId(e.target.value)} placeholder="근무자 ID 입력"/>
+              </label>
+              <button onClick={handleWorkerAdd} className="add-worker-button">
+                근무자 추가
+              </button>
+
+              <div className="worker-list">
+                <h3>추가된 근무자</h3>
+                <ul>
+                  {workers.map((worker) => (
+                    <li key={worker}>
+                      {worker} <button onClick={() => handleWorkerRemove(worker)}>삭제</button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </>
         ) : (
-          <p>캘린더를 보기 위해 시작일과 종료일을 모두 선택하세요.</p>
+          <p>시작일과 종료일을 모두 선택하세요.</p>
         )}
-      </div>
-
-      <div className="worker-section">
-        <label>
-          근무자 ID:
-          <input
-            type="text"
-            value={workerId}
-            onChange={(e) => setWorkerId(e.target.value)}
-            placeholder="근무자 ID 입력"
-          />
-        </label>
-        <button onClick={handleWorkerAdd} className="add-worker-button">
-          근무자 추가
-        </button>
-
-        <div className="worker-list">
-          <h3>추가된 근무자</h3>
-          <ul>
-            {workers.map((worker) => (
-              <li key={worker}>
-                {worker} <button onClick={() => handleWorkerRemove(worker)}>삭제</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="deadline-setting">
-        <label>
-          작성 기한:
-          <input
-            type="date"
-            value={deadline}
-            onChange={handleDeadlineChange}
-          />
-        </label>
-      </div>
-      
+      </div>  
     </div>
   );
 };

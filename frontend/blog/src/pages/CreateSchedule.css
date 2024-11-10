@@ -1,19 +1,37 @@
 .schedule-create-container {
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
 }
 
+.schedule-create-container h1 {
+    text-align: center;
+    margin-top: 20px; /* 원하는 여백으로 조정 가능 */
+  }
+
 .time-setting {
-    display: flex;
+    padding: 30px;
     justify-content: space-between;
     margin-bottom: 20px;
 }
+
+.time-setting label { /* label이 차지하는 공간을 넓히도록 설정 */
+    margin-right: 20px; /* label 요소 사이의 간격을 10px로 설정 */
+}
+
+
+.time-setting button { 
+    margin-left: 20px; 
+}
+
 
 .time-label, .day-label {
     font-weight: bold;
     text-align: center;
 }
 
+.calendar-container p {
+    text-align: center;
+}
 .schedule-grid {
     border-collapse: collapse;
     width: 100%;

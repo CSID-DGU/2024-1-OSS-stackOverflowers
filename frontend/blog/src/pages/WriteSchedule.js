@@ -4,7 +4,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import eventsData from './data/event.json';
 import './nav_schedule.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; 
 
 export default function WriteSchedule() {
   const calendarEl = useRef(null);
