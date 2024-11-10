@@ -9,7 +9,7 @@ router.get('/home', (req, res) => {
     if (!req.session.userId || req.session.userType !== 'admin') {
         return res.redirect('/');
     }
-    res.render('admin/main.html');
+    //res.sendFile(path.join(buildPath, 'index.html')); //react index.html로 렌더링 (수정 필요)
 });
 
 // 로그인
