@@ -1,6 +1,7 @@
 // events.js
 import express from 'express';
 import Event from '../models/Event.js'; // 이벤트 모델 참조 (모델 위치에 따라 경로 조정)
+import ShiftRequest from '../models/ShiftRequest.js';
 
 const router = express.Router();
 
@@ -134,9 +135,22 @@ router.get('/all', async (req, res) => {
     }
 });
 
+// 모든 근무 신청 조회 (GET /admin/events/requests)
+router.get('/requests', async (req, res) => {
+    try {
+        const shiftRequests = await ShiftRequest.find({}).populate('workerId', 'name');
+        res.status(200).json(shiftRequests);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to retrieve shift requests' });
+    }
+});
+
 
 //근무 신청 승인POST//
 router.post('/approve/:requestId', async (req, res) => {
+
+    const MAX_WORKERS_PER_SHIFT = 3; // 근무자 최대 인원
     try {
         // 승인할 신청서 조회
         const requestToApprove = await ShiftRequest.findById(req.params.requestId);
