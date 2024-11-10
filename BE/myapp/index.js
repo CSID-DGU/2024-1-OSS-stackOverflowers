@@ -1,5 +1,4 @@
 import express from 'express';
-import nunjucks from 'nunjucks';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
@@ -7,13 +6,10 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import session from 'express-session';
-
-//writing, event 라우터 추가
-import eventsRouter from './routes/events.js';
-
-//관리자/근무자 라우터
 import workerRouter from './routes/worker.js';
 import adminRouter from './routes/admin.js';
+import adminEventsRouter from './routes/adminEvents.js';
+import workerEventsRouter from './routes/workerEvents.js';
 
 // __dirname 설정 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,12 +25,12 @@ app.use(cookieParser());
 //미들웨어 실행
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-
 //정적 파일 제공
 app.use(express.static('views'));
 
 // event route 사용
-app.use('/events', eventsRouter); // '/events' 경로에 이벤트 라우터 연결
+app.use('/admin/events', adminEventsRouter);
+app.use('/worker/events', workerEventsRouter);
 
 // session 미들웨어를 다른 미들웨어보다 먼저 설정
 app.use(session({
@@ -48,15 +44,19 @@ app.use(session({
 }));
 
 // 근무자, 관리자 라우터 설정
-app.use('/worker', workerRouter);
-app.use('/admin', adminRouter);
+app.use('/worker', workerRouter); // api사용시 /worker붙이고 사용
+app.use('/admin', adminRouter); // api사용시 /admin붙이고 사용
 
-//nunjucks
-// nunjucks 설정 수정
-nunjucks.configure(path.join(__dirname, 'views'), {
-    express: app,
-    watch: true
-});             
+
+// 정적 파일 제공 (React 빌드 폴더, react실행시 nunjucks 필요없음)
+const buildPath = path.join(__dirname, '../../frontend/blog/src');//수정
+app.use(express.static(buildPath));        
+
+// React 빌드된 index.html 파일을 메인 엔트리로 제공
+
+// app.get('/*', (req, res) => {
+//     res.sendFile(path.join(buildPath, 'index.js')); //수정
+// });
 
 const port = 3080;
 
@@ -66,15 +66,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/shiftmate')
 .then(() => console.log('MongoDB 성공적으로 연결'))
 .catch(err => console.error('MongoDB 연결 중 에러가 발생:', err));
 
-
-// 메인 페이지 (로그인 페이지)
 app.get('/', (req, res) => {
-    res.render('login.html');
+    res.redirect('/home');
 });
 
-// 회원가입 페이지
 app.get('/signup', (req, res) => {
-    res.render('signup.html');
+    res.redirect('/home/signup');
 });
 
 
@@ -86,15 +83,8 @@ app.listen(3080,()=>{
 //블로그 CRUD 글작성,목록,상세페이지,수정,삭제
 //nodemon 설치 npm install nodemon -D
 
-//템플릿 엔진 ejs nunjucks
-app.set("view engine", "ejs");
-app.set("views","./views");
+// //템플릿 엔진 ejs nunjucks
+// app.set("view engine", "ejs");
+// app.set("views","./views");
 
-// 글작성
-// 글 목록 main page 페이지 접속, GET요청 /
-// 글 작성 write page 접속 GET 작성 POST /write
-// 글 상세 페이지 detail page 접속 GET /detail
-// 글 수정 페이지 edit page 접속 GET 수정 POST /edit 
-
-//버퍼 데이터 <Buffer 5b 5d>를 얻음 
-
+// react파일을 사용하면 njucks 엔진은 필요없음.

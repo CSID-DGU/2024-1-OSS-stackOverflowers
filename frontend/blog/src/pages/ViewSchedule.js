@@ -2,11 +2,13 @@ import React, { useRef, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import './nav_schedule.css';
-import { useNavigate } from 'react-router-dom'; // useNavigate 임포트
-import eventsData from './data/event.json'; // src 경로에서 파일을 import
+import { useNavigate } from 'react-router-dom'; 
+import eventsData from './data/event.json';
+import koLocale from '@fullcalendar/core/locales/ko';  
+
 export default function ViewSchedule() {
-  const calendarEl = useRef(null);
-  const navigate = useNavigate(); // 여기에 useNavigate 호출
+const calendarEl = useRef(null);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     if (calendarEl.current) {
@@ -18,7 +20,7 @@ export default function ViewSchedule() {
   const fetchEvents = (fetchInfo, successCallback, failureCallback) => {
     try {
       const events = eventsData.map(event => ({
-        title: event.name,
+        title: `${event.worker}`,
         start: event.startTime,
         end: event.endTime,
       }));
@@ -28,7 +30,7 @@ export default function ViewSchedule() {
       console.error('Failed to load events:', error);
       failureCallback(error);
     }
-  };
+  };  
   
 return (
     <>
@@ -70,8 +72,10 @@ return (
             left: 'title',
             center: '',
           }}
+          locale={koLocale}
           slotDuration="00:30:00"
           events={fetchEvents}
+          allDaySlot={false}
         />
       </div>
     </>
