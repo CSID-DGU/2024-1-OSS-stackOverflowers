@@ -1,5 +1,6 @@
 //근무 신청 스키마
-const mongoose = require('mongoose');
+import  mongoose from 'mongoose';
+
 
 const shiftRequestSchema = new mongoose.Schema({
     workerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Worker', required: true },
@@ -11,4 +12,5 @@ const shiftRequestSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-export default mongoose.model('ShiftRequest', shiftRequestSchema);
+const ShiftRequest = mongoose.model('ShiftRequest', shiftRequestSchema);
+export default ShiftRequest;
