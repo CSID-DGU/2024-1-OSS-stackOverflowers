@@ -19,6 +19,31 @@ const CreateSchedule = () => {
   const calendarRef = useRef(null);
   const navigate = useNavigate();
 
+  //로그아웃 함수 추가
+  // 로그아웃 처리 함수 추가
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert(data.message); // "로그아웃 되었습니다."
+        setTimeout(() => {
+          navigate('/home');
+        }, 100); 
+      } else {
+        alert('로그아웃 처리 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('로그아웃 처리 중 오류가 발생했습니다.');
+    }
+  };
+
   const handleEventAdd = (selectInfo) => {
     const title = prompt("새 이벤트 제목을 입력하세요:");
     if (title) {
@@ -122,7 +147,7 @@ const CreateSchedule = () => {
           </ul>
         </nav>
         <div className="auth-buttons">
-          <button onClick={() => navigate('/Home')}>로그아웃</button>
+          <button onClick={handleLogout}>로그아웃</button>
         </div>
       </header>
       <h1>근무표 생성</h1>
