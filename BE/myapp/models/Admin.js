@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 const adminSchema = new mongoose.Schema({
-    phone: {
+    id: {
         type: String,
         required: true,
         unique: true
@@ -10,7 +10,15 @@ const adminSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    name: {
+        type: String,
+        required: true,
+    },
+    phone: {
+        type: String,
+        required: true,
+    },
 }, {
     timestamps: true
 });

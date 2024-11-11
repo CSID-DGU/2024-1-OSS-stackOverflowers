@@ -13,11 +13,11 @@ router.get('/home', (req, res) => {
 });
 
 // 로그인
-router.post('/home/login', async (req, res) => {
+router.post('/login', async (req, res) => {
     try {
-        const { phone, password } = req.body;
+        const { id, password } = req.body;
         
-        const worker = await Worker.findOne({ phone });
+        const worker = await Worker.findOne({ id });
         if (!worker) {
             return res.status(404).json({ message: "존재하지 않는 회원입니다." });
         }
@@ -25,7 +25,7 @@ router.post('/home/login', async (req, res) => {
         const isMatch = await worker.comparePassword(password);
         if (!isMatch) {
             return res.status(400).json({ 
-                message: "전화번호/비밀번호가 일치하지 않습니다." 
+                message: "비밀번호가 일치하지 않습니다." 
             });
         }
 
@@ -44,25 +44,27 @@ router.post('/home/login', async (req, res) => {
 });
 
 // 회원가입
-router.post('/home/signup', async (req, res) => {
+router.post('/signup', async (req, res) => {
     try {
-        const { phone, password } = req.body;
-        
+        const { id, name, password, phone } = req.body;
+        console.log(req.body); // 전달받은 데이터 확인
+
         // 기존 사용자 확인
-        const existingWorker = await Worker.findOne({ phone });
+        const existingWorker = await Worker.findOne({ $or: [{ id }, { phone }] });
         if (existingWorker) {
             return res.status(400).json({ 
-                message: "이미 존재하는 회원입니다" 
+                message: "이미 존재하는 회원입니다",
+                redirectUrl: '/worker/login'
             });
         }
-
+    
         // 새 사용자 생성
-        const worker = new Worker({ phone, password });
+        const worker = new Worker({ id, name, password, phone });
         await worker.save();
 
         res.status(201).json({ 
             message: "회원가입 성공! 로그인 해주세요.",
-            redirectUrl: '/'
+            redirectUrl: '/worker/login'
         });
     } catch (error) {
         console.error('Signup error:', error);

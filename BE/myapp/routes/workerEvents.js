@@ -11,7 +11,6 @@ router.get('/all', async (req, res) => {
 });
 
 
-
 // 근무 신청 (POST)
 router.post('/apply', async (req, res) => {
     try {

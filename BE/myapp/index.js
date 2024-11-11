@@ -54,9 +54,9 @@ app.use(express.static(buildPath));
 
 // React 빌드된 index.html 파일을 메인 엔트리로 제공
 
-// app.get('/*', (req, res) => {
-//     res.sendFile(path.join(buildPath, 'index.js')); //수정
-// });
+app.get('/*', (req, res) => {
+    res.sendFile(path.join(buildPath, 'index.js')); //수정
+});
 
 const port = 3080;
 
@@ -66,13 +66,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/shiftmate')
 .then(() => console.log('MongoDB 성공적으로 연결'))
 .catch(err => console.error('MongoDB 연결 중 에러가 발생:', err));
 
-app.get('/', (req, res) => {
-    res.redirect('/home');
-});
-
-app.get('/signup', (req, res) => {
-    res.redirect('/home/signup');
-});
 
 
 app.listen(3080,()=>{
@@ -84,7 +77,7 @@ app.listen(3080,()=>{
 //nodemon 설치 npm install nodemon -D
 
 // //템플릿 엔진 ejs nunjucks
-// app.set("view engine", "ejs");
-// app.set("views","./views");
+app.set("view engine", "ejs");
+app.set("views","./views");
 
 // react파일을 사용하면 njucks 엔진은 필요없음.

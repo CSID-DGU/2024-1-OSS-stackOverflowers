@@ -15,9 +15,9 @@ router.get('/home', (req, res) => {
 // 로그인
 router.post('/home/login', async (req, res) => {
     try {
-        const { phone, password } = req.body;
+        const { id, password } = req.body;
         
-        const admin = await Admin.findOne({ phone });
+        const admin = await Admin.findOne({ id });
         if (!admin) {
             return res.status(404).json({ message: "존재하지 않는 회원입니다." });
         }
@@ -46,10 +46,10 @@ router.post('/home/login', async (req, res) => {
 // 회원가입
 router.post('/home/signup', async (req, res) => {
     try {
-        const { phone, password } = req.body;
+        const { id, password } = req.body;
         
         // 기존 관리자 확인
-        const existingAdmin = await Admin.findOne({ phone });
+        const existingAdmin = await Admin.findOne({ id });
         if (existingAdmin) {
             return res.status(400).json({ 
                 message: "이미 존재하는 회원입니다" 
@@ -57,7 +57,7 @@ router.post('/home/signup', async (req, res) => {
         }
 
         // 새 관리자 생성
-        const admin = new Admin({ phone, password });
+        const admin = new Admin({ id, password });
         await admin.save();
 
         res.status(201).json({ 

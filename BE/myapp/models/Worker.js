@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 const workerSchema = new mongoose.Schema({
-    phone: {
+    id: {
         type: String,
         required: true,
         unique: true
@@ -11,6 +11,16 @@ const workerSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    name: {
+        type: String,
+        required: true,
+    },
+    
+    phone: {
+        type: String,
+        required: true,
+    },
+    
 }, {
     timestamps: true
 });
