@@ -1,52 +1,3 @@
-/* 네비게이션 바 스타일 */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #52b2d5;
-    padding: 20px 20px;
-  }
-  
-  .logo_home {
-    font-size: 30px;
-    font-style: bold;
-    color: white;
-  }
-  
-  .nav-links {
-    list-style: none;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 20px;
-  }
-  .nav-links li {
-    margin: 0 10px; 
-  }
-  
-  .nav-links button {
-    margin-right: 20px;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 18px;
-    white-space: nowrap;
-  }
-  .auth-buttons {
-    display: flex;
-    align-items: center;
-    
-  }
-  .auth-buttons button {
-    background-color: white;
-    color: #52b2d5;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    margin-left: 10px;
-    white-space: nowrap;
-  }
     
   .schedule-write-container h1 {
     text-align: center;
@@ -64,8 +15,8 @@
   
   .write_calendar-container {
     width: calc(100% - 240px); /* 남은 너비를 사용하여 캘린더가 더 넓게 표시되도록 설정 */
-    overflow: hidden; /* 내용이 넘칠 경우를 대비하여 설정 */
     margin: 20px;
+    overflow-y: auto;
   }
   .fc .fc-day {
     background-color: #d3d3d3; 
