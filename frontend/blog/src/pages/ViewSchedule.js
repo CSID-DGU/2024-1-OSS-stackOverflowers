@@ -49,8 +49,7 @@ return (
           </ul>
         </nav>
         <div className="auth-buttons">
-          <button onClick={() => navigate('/home/login')}>로그인</button>
-            <button onClick={() => navigate('/home/signup')}>회원가입</button>
+          <button onClick={() => navigate('/home')}>로그아웃</button>
         </div>
       </header>
       <h1>근무표 조회</h1>
