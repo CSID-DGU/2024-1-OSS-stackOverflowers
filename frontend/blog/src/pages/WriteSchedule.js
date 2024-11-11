@@ -266,17 +266,14 @@ const updateEventStatus = (eventId, priority = null) => {
           </ul>
         </nav>
         <div className="auth-buttons">
-          <button onClick={() => navigate('/home/login')}>로그인</button>
-          <button onClick={() => navigate('/home/signup')}>회원가입</button>
+          <button onClick={() => navigate('/home')}>로그아웃</button>
         </div>
       </header>
       <h1>근무표 작성</h1>
 
       {/* 메인 컨텐츠 */}
-      <div style={{ height: '80vh', width: '90vw', margin: '0 auto' }}>
-        <div className="main-content">
-          <div style={{ display: 'flex', height: '90vh', width: '90vh', margin: '0 auto' }}>
-            <div style={{ width: '180px', padding: '10px' }}>
+        <div className="write_main-content">
+          <div className="priority_dropdown"> 
               <label htmlFor="scheduleDropdown">우선순위:</label>
               <select
                 id="scheduleDropdown"
@@ -289,9 +286,9 @@ const updateEventStatus = (eventId, priority = null) => {
                 <option value="2순위">2순위</option>
                 <option value="3순위">3순위</option>
               </select>
-            </div>
+          </div>
   
-            <div style={{ flex: 1, paddingLeft: '10px', width: '100%' }}>
+            <div classname = "write_calendar-container">
               <FullCalendar
                 ref={calendarEl}
                 plugins={[timeGridPlugin, interactionPlugin]}
@@ -309,10 +306,8 @@ const updateEventStatus = (eventId, priority = null) => {
                 nowIndicator={false}
               />
             </div>
-          </div>
         </div>
-      </div>
-      </div>
+    </div>
     </>
   );
 }  
