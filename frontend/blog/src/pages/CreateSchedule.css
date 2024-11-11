@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+    padding: 0;
+}
 .schedule-create-container {
     width: 100%;
     margin: 0 auto;
@@ -18,60 +22,65 @@
     margin-right: 20px; /* label 요소 사이의 간격을 10px로 설정 */
 }
 
-
 .time-setting button { 
     margin-left: 20px; 
 }
 
 
-.time-label, .day-label {
-    font-weight: bold;
+.create_calendar-container {
+    display: grid;
+    grid-template-columns: 1fr 270px; /* 왼쪽은 캘린더, 오른쪽은 worker-section의 고정 너비 */
+    gap: 20px; /* 두 요소 사이의 간격 */
+    margin: 0 10px; /* 전체 컨테이너 여백 */
+  }
+  
+  .create_calendar-container p {
     text-align: center;
 }
+  .create_calendar {
+    width: 100%; /* 부모 그리드 셀에 맞춰 너비 조정 */
+    height: 500px;
+    overflow-y: auto;
+  }
+  
+  .worker-section {
+    width: 100%; /* 부모 그리드 셀에 맞춰 너비 조정 */
+    margin-top: 20px; /* 상단 여백 조정 */
+  }
+  .worker-section input {
+    width: 100%; /* 기본적으로 부모 요소에 맞춰서 크기 조정 */
+    max-width: 120px; /* 최대 너비를 200px로 설정 */
+    margin-right:10px;
+    margin-bottom: 30px;
+    overflow-y: auto;
+  }
+  .worker-list {
+    list-style-type: none; /* 불릿 포인트 제거 */
+    padding-left: 0; /* 왼쪽 여백 제거 */
+  }
 
-.calendar-container p {
-    text-align: center;
-}
-.schedule-grid {
-    border-collapse: collapse;
-    width: 100%;
-    user-select: none; /* 텍스트 선택 방지 */
-}
+  .worker-list ul {
+    background-color: #d7ecf3;
+  }
 
-.grid-header {
-    display: flex;
-    font-weight: bold;
-    justify-content: center; /* 중앙 정렬 */
-}
+  .worker-list li {
+    display: flex; /* 리스트 아이템을 flex로 배치 */
+    justify-content: space-between; /* 항목을 양 끝으로 배치 */
+    align-items: center; /* 세로 중앙 정렬 */
+    padding: 0 20px;
+    margin-top:10px
+  }
 
-.day-label {
-    flex: 1; /* 각 열이 동일한 너비를 갖도록 설정 */
-    text-align: center; /* 중앙 정렬 */
-}
+  .worker-list button {
 
-.time-row {
-    display: flex;
-}
-
-.time-block {
-    flex: 1;
-    height: 40px; /* 기본 높이 설정 */
-    background-color: #ccc; /* 기본 회색 배경 */
-    border: 2px solid #ddd;
-    cursor: pointer;
-}
-
-/* 선택 시 하얀색으로 변경 */
-.time-block.selected {
-    background-color: #fff; 
-}
-
-/* 드래그할 때 색상 변화 */
-.time-block:hover {
-    background-color: #bbb; 
-}
-
-/* 30분 단위 설정 시 높이 줄이기 */
-.time-row.half-hour {
-    height: 20px; /* 행 높이 */
+    background: none; /* 배경색 제거 */
+    border: none; /* 테두리 제거 */
+    color: black; /* 글씨 색 */
+    cursor: pointer; /* 마우스 포인터를 버튼 모양으로 변경 */
+  }
+.deadline-container {
+    grid-column: 1 / 2; /* 오른쪽 열에 배치 */
+    grid-row: 2 / 3;
+    margin-left: 25px;
+    margin-top: -50px;
 }
