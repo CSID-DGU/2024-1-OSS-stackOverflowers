@@ -254,6 +254,7 @@ const updateEventStatus = (eventId, priority = null) => {
 
   return (
     <>
+    <div className="schedule-write-container">
       <header className="navbar">
         <div className="logo_home">ShiftMate</div>
         <nav>
@@ -269,19 +270,10 @@ const updateEventStatus = (eventId, priority = null) => {
           <button onClick={() => navigate('/home/signup')}>회원가입</button>
         </div>
       </header>
-  
+      <h1>근무표 작성</h1>
+
       {/* 메인 컨텐츠 */}
       <div style={{ height: '80vh', width: '90vw', margin: '0 auto' }}>
-        <div
-          style={{
-            textAlign: 'center',
-            marginBottom: '10px',
-            fontWeight: 'bold',
-            fontSize: '60px',
-          }}
-        >
-          근무표 작성
-        </div>
         <div className="main-content">
           <div style={{ display: 'flex', height: '90vh', width: '90vh', margin: '0 auto' }}>
             <div style={{ width: '180px', padding: '10px' }}>
@@ -319,6 +311,7 @@ const updateEventStatus = (eventId, priority = null) => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

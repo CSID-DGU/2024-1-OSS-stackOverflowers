@@ -48,6 +48,10 @@
     white-space: nowrap;
   }
     
+  .schedule-write-container h1 {
+    text-align: center;
+    margin-top: 20px;
+  }
   .fc .fc-day {
     background-color: #d3d3d3; 
   }
