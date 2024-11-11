@@ -259,14 +259,14 @@ const updateEventStatus = (eventId, priority = null) => {
         <nav>
           <ul className="nav-links">
             <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
-            <li><button className="main-button" onClick={() => navigate('/create')}>근무표 생성</button></li>
-            <li><button className="main-button" onClick={() => navigate('/write')}>근무표 작성</button></li>
-            <li><button className="main-button" onClick={() => navigate('/view')}>근무표 조회</button></li>
+            <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/worker/events/apply')}>근무표 작성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
           </ul>
         </nav>
         <div className="auth-buttons">
-          <button onClick={() => navigate('/login')}>로그인</button>
-          <button onClick={() => navigate('/signup')}>회원가입</button>
+          <button onClick={() => navigate('/home/login')}>로그인</button>
+          <button onClick={() => navigate('/home/signup')}>회원가입</button>
         </div>
       </header>
   

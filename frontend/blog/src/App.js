@@ -15,11 +15,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/home" />} /> {/* 메인 홈 화면 */}
         <Route path="/home" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/create" element={<CreateSchedule />} /> {/* 근무표 생성 페이지 */}
-        <Route path="/view" element={<ViewSchedule />} /> {/* 바로 ViewSchedule로 이동 */}
-        <Route path="/write" element={<WriteSchedule />} /> {/* 바로 ViewSchedule로 이동 */}
+        <Route path="/home/login" element={<Login />} />
+        <Route path="/home/signup" element={<Signup />} />
+        <Route path="/admin/events/create" element={<CreateSchedule />} /> {/* 근무표 생성 페이지 */}
+        <Route path="/worker/events/all" element={<ViewSchedule />} /> {/* 바로 ViewSchedule로 이동 */}
+        <Route path="/worker/events/apply" element={<WriteSchedule />} /> {/* 바로 ViewSchedule로 이동 */}
         {/* 추가적인 페이지를 여기에 등록할 수 있습니다 */}
       </Routes>
     </Router>
