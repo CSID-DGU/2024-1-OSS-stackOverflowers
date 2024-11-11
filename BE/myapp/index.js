@@ -10,6 +10,7 @@ import workerRouter from './routes/worker.js';
 import adminRouter from './routes/admin.js';
 import adminEventsRouter from './routes/adminEvents.js';
 import workerEventsRouter from './routes/workerEvents.js';
+import homeRouter from './routes/home.js';
 
 // __dirname 설정 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,12 +32,13 @@ app.use(express.static('views'));
 // event route 사용
 app.use('/admin/events', adminEventsRouter);
 app.use('/worker/events', workerEventsRouter);
+app.use('/home', homeRouter);
 
 // session 미들웨어를 다른 미들웨어보다 먼저 설정
 app.use(session({
     secret: 'your-secret-key',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { 
         secure: false,
         maxAge: 24 * 60 * 60 * 1000
@@ -65,8 +67,6 @@ const port = 3080;
 mongoose.connect('mongodb://127.0.0.1:27017/shiftmate')
 .then(() => console.log('MongoDB 성공적으로 연결'))
 .catch(err => console.error('MongoDB 연결 중 에러가 발생:', err));
-
-
 
 app.listen(3080,()=>{
     console.log('Server is running on port 3080');
