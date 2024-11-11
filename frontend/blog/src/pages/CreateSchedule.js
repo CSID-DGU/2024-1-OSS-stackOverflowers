@@ -28,6 +28,7 @@ const CreateSchedule = () => {
         start: selectInfo.start,
         end: selectInfo.end,
         allDay: false,
+        backgroundColor: "#52b2d5"
       };
       setEvents((prevEvents) => [...prevEvents, newEvent]);
     }

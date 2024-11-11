@@ -48,6 +48,25 @@
     white-space: nowrap;
   }
     
+  .schedule-write-container h1 {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .write_main-content {
+    padding: 30px 40px; /* 좌우에 20px 간격 추가 */
+  }
+
+  .priority_dropdown {
+    width: 200px; /* 고정 너비 설정 */
+    float: left; /* 왼쪽에 배치 */
+    margin: 50px; /* 캘린더와의 간격 조정 */
+  }
+  
+  .write_calendar-container {
+    width: calc(100% - 240px); /* 남은 너비를 사용하여 캘린더가 더 넓게 표시되도록 설정 */
+    overflow: hidden; /* 내용이 넘칠 경우를 대비하여 설정 */
+    margin: 20px;
+  }
   .fc .fc-day {
     background-color: #d3d3d3; 
   }

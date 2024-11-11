@@ -43,15 +43,15 @@ const updateEventStatus = (eventId, priority = null) => {
         // 더 뚜렷한 색상 차이를 준 우선순위별 색상
         switch(priority) {
           case '1순위':
-            backgroundColor = '#003399'; // 매우 진한 파랑
+            backgroundColor = '#023c52'; // 매우 진한 파랑
             textColor = '#FFFFFF';
             break;
           case '2순위':
-            backgroundColor = '#0066FF'; // 선명한 파랑
+            backgroundColor = '#0094c9'; // 선명한 파랑
             textColor = '#FFFFFF';
             break;
           case '3순위':
-            backgroundColor = '#66B2FF'; // 밝은 파랑
+            backgroundColor = '#b7ecff'; // 밝은 파랑
             textColor = '#000000';       // 밝은 배경색에는 검정색 텍스트
             break;
           default:
@@ -254,6 +254,7 @@ const updateEventStatus = (eventId, priority = null) => {
 
   return (
     <>
+    <div className="schedule-write-container">
       <header className="navbar">
         <div className="logo_home">ShiftMate</div>
         <nav>
@@ -265,26 +266,14 @@ const updateEventStatus = (eventId, priority = null) => {
           </ul>
         </nav>
         <div className="auth-buttons">
-          <button onClick={() => navigate('/home/login')}>로그인</button>
-          <button onClick={() => navigate('/home/signup')}>회원가입</button>
+          <button onClick={() => navigate('/home')}>로그아웃</button>
         </div>
       </header>
-  
+      <h1>근무표 작성</h1>
+
       {/* 메인 컨텐츠 */}
-      <div style={{ height: '80vh', width: '90vw', margin: '0 auto' }}>
-        <div
-          style={{
-            textAlign: 'center',
-            marginBottom: '10px',
-            fontWeight: 'bold',
-            fontSize: '60px',
-          }}
-        >
-          근무표 작성
-        </div>
-        <div className="main-content">
-          <div style={{ display: 'flex', height: '90vh', width: '90vh', margin: '0 auto' }}>
-            <div style={{ width: '180px', padding: '10px' }}>
+        <div className="write_main-content">
+          <div className="priority_dropdown"> 
               <label htmlFor="scheduleDropdown">우선순위:</label>
               <select
                 id="scheduleDropdown"
@@ -297,9 +286,9 @@ const updateEventStatus = (eventId, priority = null) => {
                 <option value="2순위">2순위</option>
                 <option value="3순위">3순위</option>
               </select>
-            </div>
+          </div>
   
-            <div style={{ flex: 1, paddingLeft: '10px', width: '100%' }}>
+            <div classname = "write_calendar-container">
               <FullCalendar
                 ref={calendarEl}
                 plugins={[timeGridPlugin, interactionPlugin]}
@@ -317,9 +306,8 @@ const updateEventStatus = (eventId, priority = null) => {
                 nowIndicator={false}
               />
             </div>
-          </div>
         </div>
-      </div>
+    </div>
     </>
   );
 }  
