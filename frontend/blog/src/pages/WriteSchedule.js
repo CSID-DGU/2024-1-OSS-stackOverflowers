@@ -43,15 +43,15 @@ const updateEventStatus = (eventId, priority = null) => {
         // 더 뚜렷한 색상 차이를 준 우선순위별 색상
         switch(priority) {
           case '1순위':
-            backgroundColor = '#003399'; // 매우 진한 파랑
+            backgroundColor = '#023c52'; // 매우 진한 파랑
             textColor = '#FFFFFF';
             break;
           case '2순위':
-            backgroundColor = '#0066FF'; // 선명한 파랑
+            backgroundColor = '#0094c9'; // 선명한 파랑
             textColor = '#FFFFFF';
             break;
           case '3순위':
-            backgroundColor = '#66B2FF'; // 밝은 파랑
+            backgroundColor = '#b7ecff'; // 밝은 파랑
             textColor = '#000000';       // 밝은 배경색에는 검정색 텍스트
             break;
           default:

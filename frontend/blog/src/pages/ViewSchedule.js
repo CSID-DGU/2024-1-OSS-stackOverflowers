@@ -24,6 +24,7 @@ const calendarEl = useRef(null);
         title: `${event.worker}`,
         start: event.startTime,
         end: event.endTime,
+        backgroundColor: "#52b2d5"
       }));
   
       successCallback(events);
