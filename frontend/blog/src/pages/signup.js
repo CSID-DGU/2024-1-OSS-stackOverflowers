@@ -1,56 +1,146 @@
 // src/SignUp.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './signup.css';
 
 const SignUp = () => {
-  const [role, setRole] = useState('');
+ const navigate = useNavigate();
+ const [formData, setFormData] = useState({
+   id: '',
+   name: '',
+   password: '',
+   phone: ''
+ });
+ const [role, setRole] = useState('');
+ const [error, setError] = useState('');
 
-  const handleRoleChange = (e) => {
-    setRole(e.target.value);
-  };
+ const handleChange = (e) => {
+   const { id, value } = e.target;
+   setFormData(prevState => ({
+     ...prevState,
+     [id]: value
+   }));
+ };
 
-  return (
-    <div className="signup-container">
-      <h1 className="title">회원가입을 위해<br />정보를 입력해주세요</h1>
+ const handleRoleChange = (e) => {
+   setRole(e.target.value);
+ };
 
-      <form className="signup-form">
-        <label htmlFor="email">* 이메일</label>
-        <input type="email" id="email" placeholder="이메일" className="input-field" />
+ const handleSubmit = async (e) => {
+   e.preventDefault();
+   setError('');
 
-        <label htmlFor="name">* 이름</label>
-        <input type="text" id="name" placeholder="이름" className="input-field" />
+   if (!formData.id || !formData.password || !role) {
+     setError('모든 필수 항목을 입력해주세요.');
+     return;
+   }
 
-        <label htmlFor="password">* 비밀번호</label>
-        <input type="password" id="password" placeholder="비밀번호" className="input-field" />
+   try {
+     let endpoint;
+     if (role === 'worker') {
+       endpoint = '/worker/signup';  // 근무자 회원가입 라우터
+     } else if (role === 'manager') {
+       endpoint = '/admin/signup';   // 관리자 회원가입 라우터
+     }
 
-        <label htmlFor="phone">* 전화번호</label>
-        <input type="text" id="phone" placeholder="전화번호" className="input-field" />
+     const response = await fetch(endpoint, {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json',
+       },
+       body: JSON.stringify(formData)
+     });
 
-        <div className="radio-group">
-          <label>
-            <input
-              type="radio"
-              value="worker"
-              checked={role === 'worker'}
-              onChange={handleRoleChange}
-            />
-            근무자
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="manager"
-              checked={role === 'manager'}
-              onChange={handleRoleChange}
-            />
-            관리자
-          </label>
-        </div>
+     const data = await response.json();
 
-        <button type="submit" className="submit-button">가입하기</button>
-      </form>
-    </div>
-  );
+     if (response.ok) {
+       alert(data.message);
+       navigate(data.redirectUrl);
+     } else {
+       setError(data.message);
+     }
+   } catch (error) {
+     console.error('Signup error:', error);
+     setError('서버 오류가 발생했습니다.');
+   }
+ };
+
+ return (
+   <div className="signup-container">
+     <h1 className="title">회원가입을 위해<br />정보를 입력해주세요</h1>
+
+     {error && <div className="error-message">{error}</div>}
+
+     <form className="signup-form" onSubmit={handleSubmit}>
+       <label htmlFor="id">* 아이디</label>
+       <input 
+         type="text" 
+         id="id" 
+         placeholder="아이디" 
+         className="input-field"
+         value={formData.id}
+         onChange={handleChange}
+         required
+       />
+
+       <label htmlFor="name">* 이름</label>
+       <input 
+         type="text" 
+         id="name" 
+         placeholder="이름" 
+         className="input-field"
+         value={formData.name}
+         onChange={handleChange}
+         required
+       />
+
+       <label htmlFor="password">* 비밀번호</label>
+       <input 
+         type="password" 
+         id="password" 
+         placeholder="비밀번호" 
+         className="input-field"
+         value={formData.password}
+         onChange={handleChange}
+         required
+       />
+      
+       <label htmlFor="phone">* 전화번호</label>
+       <input 
+         type="text" 
+         id="phone" 
+         placeholder="전화번호" 
+         className="input-field"
+         value={formData.phone}
+         onChange={handleChange}
+         required
+       />
+      
+       <div className="radio-group">
+         <label>
+           <input
+             type="radio"
+             value="worker"
+             checked={role === 'worker'}
+             onChange={handleRoleChange}
+           />
+           근무자
+         </label>
+         <label>
+           <input
+             type="radio"
+             value="manager"
+             checked={role === 'manager'}
+             onChange={handleRoleChange}
+           />
+           관리자
+         </label>
+       </div>
+
+       <button type="submit" className="submit-button">가입하기</button>
+     </form>
+   </div>
+ );
 };
 
 export default SignUp;
