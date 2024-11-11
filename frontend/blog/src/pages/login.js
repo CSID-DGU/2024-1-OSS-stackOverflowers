@@ -6,8 +6,8 @@ const Login = () => {
   const navigate = useNavigate();
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [error, setError] = useState('');
-
   const handleIdChange = (e) => {
     setId(e.target.value);
   };
@@ -16,17 +16,24 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
+  const handleRoleChange = (e) => {
+    setRole(e.target.value);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
 
     try {
-      const response = await fetch('/worker/login', {
+      const response = await fetch('/home/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ id, password })
+        body: JSON.stringify({ 
+          id, 
+          password, 
+          userType: role === 'manager' ? 'admin' : 'worker' })
       });
 
       const data = await response.json();
@@ -64,6 +71,25 @@ const Login = () => {
           onChange={handlePasswordChange}
           required
         />
+         <label>
+           <input
+             type="radio"
+             value="worker"
+             checked={role === 'worker'}
+             onChange={handleRoleChange}
+           />
+           근무자
+         </label>
+         <label>
+           <input
+             type="radio"
+             value="manager"
+             checked={role === 'manager'}
+             onChange={handleRoleChange}
+           />
+           관리자
+         </label>
+     
         <button type="submit" className="login-button">로그인</button>
       </form>
 

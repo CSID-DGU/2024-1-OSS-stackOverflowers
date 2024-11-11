@@ -27,43 +27,45 @@ const SignUp = () => {
  };
 
  const handleSubmit = async (e) => {
-   e.preventDefault();
-   setError('');
+  e.preventDefault();
+  setError('');
 
-   if (!formData.id || !formData.password || !role) {
-     setError('모든 필수 항목을 입력해주세요.');
-     return;
-   }
+  if (!formData.id || !formData.password || !role) {
+    setError('모든 필수 항목을 입력해주세요.');
+    return;
+  }
 
-   try {
-     let endpoint;
-     if (role === 'worker') {
-       endpoint = '/worker/signup';  // 근무자 회원가입 라우터
-     } else if (role === 'manager') {
-       endpoint = '/admin/signup';   // 관리자 회원가입 라우터
-     }
+  try {
+    // role을 userType으로 포함시켜 전송
+    const response = await fetch('/home/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...formData,
+        userType: role === 'manager' ? 'admin' : 'worker' // role 값을 서버가 이해할 수 있는 형식으로 변환
+      })
+    });
 
-     const response = await fetch(endpoint, {
-       method: 'POST',
-       headers: {
-         'Content-Type': 'application/json',
-       },
-       body: JSON.stringify(formData)
-     });
+    const data = await response.json();
 
-     const data = await response.json();
+    if (response.ok) {
+      alert(data.message);
+      navigate(data.redirectUrl);
+    } else {
+      setError(data.message);
+      // 에러 응답에도 리다이렉션이 포함된 경우 처리
+      if (data.redirectUrl) {
+        navigate(data.redirectUrl);
+      }
+    }
+  } catch (error) {
+    console.error('Signup error:', error);
+    setError('서버 오류가 발생했습니다.');
+  }
+};
 
-     if (response.ok) {
-       alert(data.message);
-       navigate(data.redirectUrl);
-     } else {
-       setError(data.message);
-     }
-   } catch (error) {
-     console.error('Signup error:', error);
-     setError('서버 오류가 발생했습니다.');
-   }
- };
 
  return (
    <div className="signup-container">
