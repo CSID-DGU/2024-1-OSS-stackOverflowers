@@ -5,6 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import './nav_schedule.css';
 import './CreateSchedule.css'
+import koLocale from '@fullcalendar/core/locales/ko';
 
 const CreateSchedule = () => {
   const [events, setEvents] = useState([]);
@@ -19,8 +20,33 @@ const CreateSchedule = () => {
   const calendarRef = useRef(null);
   const navigate = useNavigate();
 
+  //로그아웃 함수 추가
+  // 로그아웃 처리 함수 추가
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert(data.message); // "로그아웃 되었습니다."
+        setTimeout(() => {
+          navigate('/home');
+        }, 100); 
+      } else {
+        alert('로그아웃 처리 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('로그아웃 처리 중 오류가 발생했습니다.');
+    }
+  };
+
   const handleEventAdd = (selectInfo) => {
-    const title = prompt("새 이벤트 제목을 입력하세요:");
+    const title = prompt("근무명을 입력하세요:");
     if (title) {
       const newEvent = {
         id: String(Date.now()),
@@ -35,7 +61,7 @@ const CreateSchedule = () => {
   };
 
   const handleEventRemove = (clickInfo) => {
-    if (window.confirm("이 이벤트를 삭제하시겠습니까?")) {
+    if (window.confirm("이 근무를 삭제하시겠습니까?")) {
       clickInfo.event.remove();
       setEvents((prevEvents) =>
         prevEvents.filter((event) => event.id !== clickInfo.event.id)
@@ -122,7 +148,7 @@ const CreateSchedule = () => {
           </ul>
         </nav>
         <div className="auth-buttons">
-          <button onClick={() => navigate('/Home')}>로그아웃</button>
+          <button onClick={handleLogout}>로그아웃</button>
         </div>
       </header>
       <h1>근무표 생성</h1>
@@ -163,7 +189,7 @@ const CreateSchedule = () => {
         <label>
           근무 종료 시간:
           <select value={endHour} onChange={(e) => setEndHour(e.target.value)}>
-            {Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`).map((hour) => (
+            {Array.from({ length: 25 }, (_, i) => `${String(i).padStart(2, '0')}:00`).map((hour) => (
               <option key={hour} value={hour}>
                 {hour}
               </option>
@@ -187,14 +213,10 @@ const CreateSchedule = () => {
         </button>
       </div>
 
-      <div className="calendar-container">
+      <div className="create_calendar-container">
         {startDate && endDate ? (
           <>
-            <div className="deadline-container">
-              <label htmlFor="deadline">작성기한: </label>
-              <input type="date" id="deadline" name="deadline" />
-            </div>
-            <div className="calendar">
+            <div className="create_calendar">
               <FullCalendar
                 ref={calendarRef}
                 plugins={[timeGridPlugin, interactionPlugin]}
@@ -224,7 +246,8 @@ const CreateSchedule = () => {
                   minute: '2-digit',
                   hour12: false, // 24시간 형식
                 }}
-                height="auto" // 높이를 자동으로 조절
+                height="90%" // 높이를 자동으로 조절
+                locale={koLocale}
               />
             </div>
 
@@ -234,7 +257,7 @@ const CreateSchedule = () => {
                 <input type="text" value={workerId} onChange={(e) => setWorkerId(e.target.value)} placeholder="근무자 ID 입력"/>
               </label>
               <button onClick={handleWorkerAdd} className="add-worker-button">
-                근무자 추가
+                추가
               </button>
 
               <div className="worker-list">
@@ -247,7 +270,12 @@ const CreateSchedule = () => {
                   ))}
                 </ul>
               </div>
+              
             </div>
+            <div className="deadline-container">
+                <label htmlFor="deadline">작성기한: </label>
+                <input type="date" id="deadline" name="deadline" />
+              </div>
           </>
         ) : (
           <p>시작일과 종료일을 모두 선택하세요.</p>

@@ -294,8 +294,9 @@ const updateEventStatus = (eventId, priority = null) => {
                 plugins={[timeGridPlugin, interactionPlugin]}
                 initialView="timeGridWeek"
                 headerToolbar={{
-                  center: '',
-                  left: 'title',
+                  left:'',
+                  center: 'title',
+                  right: ''
                 }}
                 slotDuration="00:30:00"
                 events={events}
@@ -304,6 +305,7 @@ const updateEventStatus = (eventId, priority = null) => {
                 eventClick={handleEventClick}
                 locale={koLocale}
                 nowIndicator={false}
+                height={550}
               />
             </div>
         </div>

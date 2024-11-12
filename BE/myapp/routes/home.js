@@ -76,4 +76,32 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// 로그아웃 라우트 추가
+router.post('/logout', (req, res) => {
+    try {
+        if (req.session) {
+            req.session.destroy((err) => {
+                if (err) {
+                    return res.status(500).json({ 
+                        message: "로그아웃 처리 중 오류가 발생했습니다." 
+                    });
+                }
+                
+                res.clearCookie('connect.sid');
+                res.status(200).json({ 
+                    message: "로그아웃 되었습니다.",
+                });
+            });
+        } else {
+            res.status(200).json({ 
+                message: "이미 로그아웃된 상태입니다.",
+            });
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        res.status(500).json({ 
+            message: "서버 오류가 발생했습니다." 
+        });
+    }
+});
 export default router;
