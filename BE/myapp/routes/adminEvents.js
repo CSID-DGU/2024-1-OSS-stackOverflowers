@@ -147,6 +147,75 @@ router.get('/requests', async (req, res) => {
 });
 
 
+
+// 근무자 선발 알고리즘 함수
+const selectWorkers = async () => {
+    const requests = await ShiftRequest.find({ status: 'Pending' });
+    const MAX_WORKERS = 3; // 근무자 최대 인원
+    // 점수 계산 및 정렬
+    const sortedRequests = requests
+        .map(request => {
+            // 마지막 근무로부터 경과한 시간 (시간 단위)
+            const hoursSinceLastShift = (new Date() - new Date(request.lastShiftEnd)) / (1000 * 60 * 60);
+
+            // 점수 계산: 마지막 근무 경과 시간 + 거절 횟수에 따른 가산점
+            const score = hoursSinceLastShift + request.rejections * 5;
+            return { ...request.toObject(), score };
+        })
+        .sort((a, b) => b.score - a.score); // 높은 점수 순으로 정렬
+
+    // 선발된 근무자와 거절된 근무자 분리
+    const selectedWorkers = sortedRequests.slice(0, MAX_WORKERS);
+    const rejectedWorkers = sortedRequests.slice(MAX_WORKERS);
+
+    // 근무자 상태 업데이트
+    for (const worker of selectedWorkers) {
+        await ShiftRequest.findByIdAndUpdate(worker._id, { status: 'Approved' });
+    }
+    for (const worker of rejectedWorkers) {
+        await ShiftRequest.findByIdAndUpdate(worker._id, { status: 'Rejected' });
+    }
+
+    // 선발된 근무자와 거절된 근무자를 필요한 형태로 반환
+    return {
+        selectedWorkers: selectedWorkers.map(worker => ({
+            name: worker.name,
+            score: worker.score
+        })),
+        rejectedWorkers: rejectedWorkers.map(worker => ({
+            name: worker.name,
+            score: worker.score
+        }))
+    };
+};
+
+// 근무자 선발 API
+router.post('/approve', async (req, res) => {
+    try {
+        // 근무자 선발 알고리즘 실행
+        const { selectedWorkers, rejectedWorkers } = await selectWorkers();
+
+        // 결과를 클라이언트로 반환
+        res.status(200).json({
+            message: '근무자 선발 완료',
+            selectedWorkers,
+            rejectedWorkers
+        });
+    } catch (error) {
+        console.error('근무자 선발 오류:', error);
+        res.status(500).json({ message: '근무자 선발에 실패했습니다.' });
+    }
+});
+
+
+
+
+
+
+
+
+
+
 //근무 신청 승인POST//
 router.post('/approve/:requestId', async (req, res) => {
 

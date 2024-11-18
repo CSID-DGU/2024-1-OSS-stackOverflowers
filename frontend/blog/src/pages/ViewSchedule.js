@@ -61,8 +61,9 @@ return (
           initialView="timeGridWeek"
           height="80%"
           headerToolbar={{
-            left: 'title',
-            center: '',
+            left: '',
+            center: 'title',
+            right:'prev,next'
           }}
           locale={koLocale}
           slotDuration="00:30:00"
