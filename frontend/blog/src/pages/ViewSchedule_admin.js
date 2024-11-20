@@ -7,7 +7,7 @@ import eventsData from './data/event.json';
 import koLocale from '@fullcalendar/core/locales/ko';
 import './ModifySchedule.css'
 
-export default function ModifySchedule() {
+export default function ViewSchedule_admin() {
   const calendarEl = useRef(null);
   const navigate = useNavigate();
 
@@ -18,18 +18,16 @@ export default function ModifySchedule() {
     }
   }, []);
 
-  const handleSave = () => {
-    // 저장 로직 구현
-    console.log('Schedule saved');
-    // 필요한 저장 로직 추가
-    navigate('/admin/events/all');
+  const handlerender = () => {
+    // 다른 페이지로 이동
+    navigate('/admin/events/edit/');
   };
 
   // 커스텀 버튼 렌더링 함수
   const renderSaveButton = () => {
     return {
-      text: '저장',
-      click: handleSave,
+      text: '수정',
+      click: handlerender,
       className: 'fc-button-primary'
     };
   };
@@ -67,7 +65,7 @@ export default function ModifySchedule() {
             <button onClick={() => navigate('/home')}>로그아웃</button>
           </div>
         </header>
-        <h1>근무표 수정</h1>
+        <h1>근무표 조회</h1>
         {/* 메인 컨텐츠 */}
         <div style={{ height: '80vh', width: '90vw', margin: '0 auto' }}>
           <FullCalendar
