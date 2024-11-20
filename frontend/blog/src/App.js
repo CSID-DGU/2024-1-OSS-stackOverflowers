@@ -6,7 +6,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import CreateSchedule from './pages/CreateSchedule';
 import WriteSchedule from './pages/WriteSchedule';
-import ViewSchedule from './pages/ViewSchedule';
+import ViewSchedule_worker from './pages/ViewSchedule_worker';
 import ModifySchedule from './pages/ModifySchedule';
 import ViewSchedule_admin from './pages/ViewSchedule_admin';
 
@@ -20,7 +20,7 @@ function App() {
         <Route path="/home/login" element={<Login />} />
         <Route path="/home/signup" element={<Signup />} />
         <Route path="/admin/events/create" element={<CreateSchedule />} /> {/* 근무표 생성 페이지 */}
-        <Route path="/worker/events/all" element={<ViewSchedule />} /> {/* 바로 ViewSchedule로 이동 */}
+        <Route path="/worker/events/all" element={<ViewSchedule_worker />} /> {/* 바로 ViewSchedule로 이동 */}
         <Route path="/worker/events/apply" element={<WriteSchedule />} /> {/* 바로 ViewSchedule로 이동 */}
         <Route path="/admin/events/all/" element={<ViewSchedule_admin />} /> {/* 바로 ViewSchedule로 이동 */}
         <Route path="/admin/events/edit/" element={<ModifySchedule/>} /> {/* 바로 ViewSchedule로 이동 */}
