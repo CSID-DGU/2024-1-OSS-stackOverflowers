@@ -1,4 +1,4 @@
-# StackoverFlowers_03_Backend
+# StackoverFlowers_03
 
 ## 팀원
 
