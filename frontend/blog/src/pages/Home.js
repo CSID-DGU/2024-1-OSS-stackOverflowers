@@ -13,9 +13,9 @@ function Home() {
         <nav>
           <ul className="nav-links">
             <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
-            <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
-            <li><button className="main-button" onClick={() => navigate('/worker/events/apply')}>근무표 작성</button></li>
-            <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
+            <li><button className="main-button" onClick={() => navigate('/home/login')}>근무표 생성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/home/login')}>근무표 작성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/home/login')}>근무표 조회</button></li>
           </ul>
         </nav>
         <div className="auth-buttons">
