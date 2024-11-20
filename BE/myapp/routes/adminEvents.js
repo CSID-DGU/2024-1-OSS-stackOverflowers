@@ -6,9 +6,9 @@ import ShiftRequest from '../models/ShiftRequest.js';
 const router = express.Router();
 
 // 이벤트 생성create (GET)
-router.get('/create', (req, res) => {
-    res.render('createEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
-});
+// router.get('/create', (req, res) => {
+//     res.render('createEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
+// });
 
 // 이벤트 생성create (POST)
 router.post('/create', async (req, res) => {
@@ -216,7 +216,7 @@ router.post('/approve', async (req, res) => {
 
 
 
-//근무 신청 승인POST//
+//근무 신청 승인POST//(필요없음)
 router.post('/approve/:requestId', async (req, res) => {
 
     const MAX_WORKERS_PER_SHIFT = 3; // 근무자 최대 인원
@@ -249,7 +249,7 @@ router.post('/approve/:requestId', async (req, res) => {
     }
 });
 
-// 근무 신청 거절 (POST)
+// 근무 신청 거절 (POST)(필요없음)
 router.post('/reject/:requestId', async (req, res) => {
     try {
         const request = await ShiftRequest.findByIdAndUpdate(req.params.requestId, { status: 'Rejected' });
