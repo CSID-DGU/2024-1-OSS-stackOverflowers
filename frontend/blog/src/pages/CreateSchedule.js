@@ -49,10 +49,10 @@ const CreateSchedule = () => {
     const title = prompt("근무명을 입력하세요:");
     if (title) {
       const newEvent = {
-        id: String(Date.now()),
+        id: `${Date.now()}-${Math.random()}`,
         title,
-        start: selectInfo.start,
-        end: selectInfo.end,
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
         allDay: false,
         backgroundColor: "#52b2d5"
       };
@@ -75,7 +75,10 @@ const CreateSchedule = () => {
 
   const handleSaveSchedule = () => {
     // 저장할 근무표 데이터
-    const scheduleData = {
+    const existingData = JSON.parse(localStorage.getItem("scheduleData")) || [];
+    const validExistingData = Array.isArray(existingData) ? existingData : [];
+    const newScheduleData = {
+      id: `${Date.now()}-${Math.random()}`,
       events,
       startHour,
       endHour,
@@ -85,7 +88,8 @@ const CreateSchedule = () => {
       workers,
       deadline,
     };
-    localStorage.setItem("scheduleData", JSON.stringify(scheduleData));
+    const updatedData = [...validExistingData, newScheduleData];
+    localStorage.setItem("scheduleData", JSON.stringify(updatedData));
     alert("근무표가 저장되었습니다.");
 
     setEvents([]);
@@ -143,7 +147,7 @@ const CreateSchedule = () => {
           <ul className="nav-links">
             <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
             <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
-            <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
+            <li><button className="main-button" onClick={() => navigate('/admin/events/all')}>근무표 조회</button></li>
           </ul>
         </nav>
         <div className="auth-buttons">
