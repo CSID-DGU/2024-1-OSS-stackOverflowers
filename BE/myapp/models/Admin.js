@@ -11,7 +11,7 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    name: {
+    userName: {
         type: String,
         required: true,
     },

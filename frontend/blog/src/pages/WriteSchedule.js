@@ -268,7 +268,7 @@ const updateEventStatus = (eventId, priority = null) => {
           <button onClick={() => navigate('/home')}>로그아웃</button>
         </div>
       </header>
-      <h1>근무표 작성</h1>
+      <h1>근무표 신청</h1>
 
       {/* 메인 컨텐츠 */}
         <div className="write_main-content">

@@ -6,7 +6,7 @@ const router = express.Router();
 // 통합 회원가입
 router.post('/signup', async (req, res) => {
     try {
-        const { id, name, password, phone, userType } = req.body;
+        const { id, userName, password, phone, userType } = req.body;
         
         // userType에 따라 적절한 모델 선택
         const Model = userType === 'admin' ? Admin : Worker;
@@ -23,7 +23,7 @@ router.post('/signup', async (req, res) => {
         }
 
         // 새 사용자 생성
-        const user = new Model({ id, name, password, phone });
+        const user = new Model({ id, userName, password, phone });
         await user.save();
 
         res.status(201).json({ 
