@@ -11,6 +11,7 @@ const shiftRequestSchema = new mongoose.Schema({
     status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
     description: String,
     rejections: { type: Number, default: 0 },
+    priority: { type: Number, enum: [1, 2, 3], default: 1 }, // 우선순위 필드 추가
     createdAt: { type: Date, default: Date.now }
 });
 

@@ -20,6 +20,10 @@ const workerSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    rejections: { // 거절 횟수
+        type: Number,
+        default: 0
+    },
     
 }, {
     timestamps: true
