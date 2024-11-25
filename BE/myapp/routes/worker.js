@@ -11,6 +11,8 @@ router.get('/home', (req, res) => {
     res.redirect('/worker/main');
 });
 
-
+router.get('/main', (req, res) => {
+    res.render('Home_worker')
+})
  
 export default router;

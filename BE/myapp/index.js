@@ -13,6 +13,12 @@ import adminEventsRouter from './routes/adminEvents.js';
 import workerEventsRouter from './routes/workerEvents.js';
 import homeRouter from './routes/home.js';
 
+import { createRequire } from 'module';
+import swaggerUi from 'swagger-ui-express'
+//import swaggerFile from './swagger-output.json';
+
+const require = createRequire(import.meta.url);
+const swaggerFile = require('./swagger-output.json');
 
 // __dirname 설정 
 const __filename = fileURLToPath(import.meta.url);
@@ -30,6 +36,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 //정적 파일 제공
 app.use(express.static('views'));
+
+//swagger
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 // event route 사용
 app.use('/admin/events', adminEventsRouter);
@@ -53,13 +62,12 @@ app.use('/admin', adminRouter); // api사용시 /admin붙이고 사용
 
 
 // 정적 파일 제공 (React 빌드 폴더, react실행시 nunjucks 필요없음)
-const buildPath = path.join(__dirname, '../../frontend/blog/src');//수정
+const buildPath = path.join(__dirname, '../../frontend/blog/build');//수정
 app.use(express.static(buildPath));        
 
 // React 빌드된 index.html 파일을 메인 엔트리로 제공
-
 app.get('/*', (req, res) => {
-    res.sendFile(path.join(buildPath, 'index.js')); //수정
+    res.sendFile(path.join(buildPath, 'index.html')); //수정
 });
 
 const port = 3080;
@@ -83,3 +91,5 @@ app.set("view engine", "ejs");
 app.set("views","./views");
 
 // react파일을 사용하면 njucks 엔진은 필요없음.
+
+ 

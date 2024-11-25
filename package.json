@@ -1,8 +1,23 @@
 {
   "dependencies": {
-"@fullcalendar/react": "^6.1.4",
-"@fullcalendar/core": "^6.1.4",
-"@fullcalendar/daygrid": "^6.1.4",
-"@fullcalendar/common": "^6.1.4"
-  }
+    "@fullcalendar/common": "^5.11.5",
+    "@fullcalendar/core": "^6.1.4",
+    "@fullcalendar/daygrid": "^6.1.4",
+    "@fullcalendar/react": "^6.1.4"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "cross-env": "^7.0.3"
+  },
+  "name": "git",
+  "version": "1.0.0",
+  "description": "| 구분  | 역할                    | 이름                     |\r | ------ | -------------------------- | ------------------------ |\r | 1     |    프론트엔드                   | 김민정    |\r | 2    | 프론트엔드                    | 김서연              |\r | 3     | 백엔드            | 윤석규          |\r | 4     | 백엔드            | 지경민           |",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

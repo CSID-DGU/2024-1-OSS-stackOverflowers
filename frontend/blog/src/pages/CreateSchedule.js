@@ -141,13 +141,13 @@ const CreateSchedule = () => {
         <div className="logo_home">ShiftMate</div>
         <nav>
           <ul className="nav-links">
-            <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
+            <li><button className="main-button" onClick={() => { window.location.href = '/admin/main'; }}>홈</button></li>
             <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
-            <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
+            <li><button className="main-button" onClick={() => navigate('/admin/events/all')}>근무표 조회</button></li>
           </ul>
         </nav>
         <div className="auth-buttons">
-          <button onClick={handleLogout}>로그아웃</button>
+        <button onClick={() => navigate('/home')}>로그아웃</button>
         </div>
       </header>
       <h1>근무표 생성</h1>

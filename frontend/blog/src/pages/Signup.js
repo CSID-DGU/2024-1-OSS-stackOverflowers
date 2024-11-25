@@ -7,7 +7,7 @@ const SignUp = () => {
  const navigate = useNavigate();
  const [formData, setFormData] = useState({
    id: '',
-   name: '',
+   userName: '',
    password: '',
    phone: ''
  });
@@ -85,13 +85,13 @@ const SignUp = () => {
          required
        />
 
-       <label htmlFor="name">* 이름</label>
+       <label htmlFor="userName">* 이름</label>
        <input 
          type="text" 
-         id="name" 
+         id="userName" 
          placeholder="이름" 
          className="input-field"
-         value={formData.name}
+         value={formData.userName}
          onChange={handleChange}
          required
        />
