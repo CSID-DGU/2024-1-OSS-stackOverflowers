@@ -73,35 +73,50 @@ const CreateSchedule = () => {
     setEvents([]);
   };
 
-  const handleSaveSchedule = () => {
-    // 저장할 근무표 데이터
-    const existingData = JSON.parse(localStorage.getItem("scheduleData")) || [];
-    const validExistingData = Array.isArray(existingData) ? existingData : [];
-    const newScheduleData = {
-      id: `${Date.now()}-${Math.random()}`,
-      events,
-      startHour,
-      endHour,
-      timeUnit,
-      startDate,
-      endDate,
-      workers,
-      deadline,
-    };
-    const updatedData = [...validExistingData, newScheduleData];
-    localStorage.setItem("scheduleData", JSON.stringify(updatedData));
-    alert("근무표가 저장되었습니다.");
+  const handleSaveSchedule = async () => {
+    try {
+      const scheduleData = {
+        events: events.map(event => ({
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          allDay: event.allDay || false,
+        })),
+        startHour,
+        endHour,
+        timeUnit,
+        startDate,
+        endDate,
+        workers,
+        deadline,
+      };
 
-    setEvents([]);
-    setStartHour("09:00");
-    setEndHour("23:00");
-    setTimeUnit(1);
-    setStartDate("");
-    setEndDate("");
-    setWorkers([]);
-    setDeadline("");
+      const response = await fetch('/admin/events/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scheduleData),
+      });
 
-  }; 
+      if (response.ok) {
+        alert("근무표가 저장되었습니다.");
+        setEvents([]);
+        setStartHour("09:00");
+        setEndHour("23:00");
+        setTimeUnit(1);
+        setStartDate("");
+        setEndDate("");
+        setWorkers([]);
+        setDeadline("");
+      } else {
+        throw new Error("근무표 저장에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error('Schedule save error:', error);
+      alert("근무표 저장 중 오류가 발생했습니다.");
+    }
+  };
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
   };
