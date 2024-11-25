@@ -4,6 +4,8 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import './nav_schedule.css';
+import './CreateSchedule.css'
+import koLocale from '@fullcalendar/core/locales/ko';
 
 const CreateSchedule = () => {
   const [events, setEvents] = useState([]);
@@ -18,22 +20,48 @@ const CreateSchedule = () => {
   const calendarRef = useRef(null);
   const navigate = useNavigate();
 
+  //로그아웃 함수 추가
+  // 로그아웃 처리 함수 추가
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert(data.message); // "로그아웃 되었습니다."
+        setTimeout(() => {
+          navigate('/home');
+        }, 100); 
+      } else {
+        alert('로그아웃 처리 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('로그아웃 처리 중 오류가 발생했습니다.');
+    }
+  };
+
   const handleEventAdd = (selectInfo) => {
-    const title = prompt("새 이벤트 제목을 입력하세요:");
+    const title = prompt("근무명을 입력하세요:");
     if (title) {
       const newEvent = {
-        id: String(Date.now()),
+        id: `${Date.now()}-${Math.random()}`,
         title,
-        start: selectInfo.start,
-        end: selectInfo.end,
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
         allDay: false,
+        backgroundColor: "#52b2d5"
       };
       setEvents((prevEvents) => [...prevEvents, newEvent]);
     }
   };
 
   const handleEventRemove = (clickInfo) => {
-    if (window.confirm("이 이벤트를 삭제하시겠습니까?")) {
+    if (window.confirm("이 근무를 삭제하시겠습니까?")) {
       clickInfo.event.remove();
       setEvents((prevEvents) =>
         prevEvents.filter((event) => event.id !== clickInfo.event.id)
@@ -47,7 +75,10 @@ const CreateSchedule = () => {
 
   const handleSaveSchedule = () => {
     // 저장할 근무표 데이터
-    const scheduleData = {
+    const existingData = JSON.parse(localStorage.getItem("scheduleData")) || [];
+    const validExistingData = Array.isArray(existingData) ? existingData : [];
+    const newScheduleData = {
+      id: `${Date.now()}-${Math.random()}`,
       events,
       startHour,
       endHour,
@@ -57,7 +88,8 @@ const CreateSchedule = () => {
       workers,
       deadline,
     };
-    localStorage.setItem("scheduleData", JSON.stringify(scheduleData));
+    const updatedData = [...validExistingData, newScheduleData];
+    localStorage.setItem("scheduleData", JSON.stringify(updatedData));
     alert("근무표가 저장되었습니다.");
 
     setEvents([]);
@@ -114,17 +146,15 @@ const CreateSchedule = () => {
         <nav>
           <ul className="nav-links">
             <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
-            <li><button className="main-button" onClick={() => navigate('/create')}>근무표 생성</button></li>
-            <li><button className="main-button" onClick={() => navigate('/write')}>근무표 작성</button></li>
-            <li><button className="main-button" onClick={() => navigate('/view')}>근무표 조회</button></li>
+            <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/admin/events/all')}>근무표 조회</button></li>
           </ul>
         </nav>
         <div className="auth-buttons">
-          <button onClick={() => navigate('/Home')}>로그아웃</button>
+          <button onClick={handleLogout}>로그아웃</button>
         </div>
       </header>
       <h1>근무표 생성</h1>
-      <p>근무 시작 시간, 종료 시간, 시간 단위를 설정하세요.</p>
 
       <div className="time-setting">
         <label>
@@ -162,7 +192,7 @@ const CreateSchedule = () => {
         <label>
           근무 종료 시간:
           <select value={endHour} onChange={(e) => setEndHour(e.target.value)}>
-            {Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`).map((hour) => (
+            {Array.from({ length: 25 }, (_, i) => `${String(i).padStart(2, '0')}:00`).map((hour) => (
               <option key={hour} value={hour}>
                 {hour}
               </option>
@@ -186,81 +216,74 @@ const CreateSchedule = () => {
         </button>
       </div>
 
-      <div className="calendar-container">
+      <div className="create_calendar-container">
         {startDate && endDate ? (
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[timeGridPlugin, interactionPlugin]}
-            initialView="timeGrid"
-            selectable={true}
-            editable={true}
-            events={events}
-            headerToolbar={{
-              left: "",
-              center: "title",
-              right: "",
-            }}
-            slotMinTime={startHour} // 시작 시간
-            slotMaxTime={endHour} // 종료 시간
-            slotDuration={`${timeUnit === 1 ? "01:00" : "00:30"}`} // 시간 단위
-            slotLabelInterval="00:30:00"
-            allDaySlot={false}
-            select={handleEventAdd}
-            eventClick={handleEventRemove}
-            initialDate={startDate}
-            visibleRange={{
-              start: startDate,
-              end: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString().split("T")[0],
-            }}
-            slotLabelFormat={{
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false, // 24시간 형식
-            }}
-            height="auto" // 높이를 자동으로 조절
-          />
+          <>
+            <div className="create_calendar">
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[timeGridPlugin, interactionPlugin]}
+                initialView="timeGrid"
+                selectable={true}
+                editable={true}
+                events={events}
+                headerToolbar={{
+                  left: "",
+                  center: "title",
+                  right: "",
+                }}
+                slotMinTime={startHour} // 시작 시간
+                slotMaxTime={endHour} // 종료 시간
+                slotDuration={`${timeUnit === 1 ? "01:00" : "00:30"}`} // 시간 단위
+                slotLabelInterval="00:30:00"
+                allDaySlot={false}
+                select={handleEventAdd}
+                eventClick={handleEventRemove}
+                initialDate={startDate}
+                visibleRange={{
+                  start: startDate,
+                  end: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString().split("T")[0],
+                }}
+                slotLabelFormat={{
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false, // 24시간 형식
+                }}
+                height="90%" // 높이를 자동으로 조절
+                locale={koLocale}
+              />
+            </div>
+
+            <div className="worker-section">
+              <label>
+                근무자 ID:
+                <input type="text" value={workerId} onChange={(e) => setWorkerId(e.target.value)} placeholder="근무자 ID 입력"/>
+              </label>
+              <button onClick={handleWorkerAdd} className="add-worker-button">
+                추가
+              </button>
+
+              <div className="worker-list">
+                <h3>추가된 근무자</h3>
+                <ul>
+                  {workers.map((worker) => (
+                    <li key={worker}>
+                      {worker} <button onClick={() => handleWorkerRemove(worker)}>삭제</button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+            </div>
+            <div className="deadline-container">
+                <label htmlFor="deadline">작성기한: </label>
+                <input type="date" id="deadline" name="deadline" />
+              </div>
+          </>
         ) : (
-          <p>캘린더를 보기 위해 시작일과 종료일을 모두 선택하세요.</p>
+          <p>시작일과 종료일을 모두 선택하세요.</p>
         )}
-      </div>
-
-      <div className="worker-section">
-        <label>
-          근무자 ID:
-          <input
-            type="text"
-            value={workerId}
-            onChange={(e) => setWorkerId(e.target.value)}
-            placeholder="근무자 ID 입력"
-          />
-        </label>
-        <button onClick={handleWorkerAdd} className="add-worker-button">
-          근무자 추가
-        </button>
-
-        <div className="worker-list">
-          <h3>추가된 근무자</h3>
-          <ul>
-            {workers.map((worker) => (
-              <li key={worker}>
-                {worker} <button onClick={() => handleWorkerRemove(worker)}>삭제</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="deadline-setting">
-        <label>
-          작성 기한:
-          <input
-            type="date"
-            value={deadline}
-            onChange={handleDeadlineChange}
-          />
-        </label>
-      </div>
-      
+      </div>  
     </div>
   );
 };

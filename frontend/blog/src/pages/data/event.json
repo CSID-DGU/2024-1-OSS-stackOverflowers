@@ -1,13 +1,17 @@
 [
     {
-      "name": "Morning Meeting",
-      "startTime": "2024-11-04T09:00:00",
-      "endTime": "2024-11-04T10:00:00"
+      "name": "근무1",
+      "startTime": "2024-11-11T09:00:00",
+      "endTime": "2024-11-11T14:00:00",
+      "priority":1,
+      "worker":"김민정"
     },
     {
-      "name": "Afternoon Shift",
-      "startTime": "2024-11-05T14:00:00",
-      "endTime": "2024-11-05T16:00:00"
+      "name": "근무2",
+      "startTime": "2024-11-13T11:00:00",
+      "endTime": "2024-11-13T17:00:00",
+      "priority":3,
+      "worker":"김서연"
     }
   ]
   

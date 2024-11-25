@@ -138,7 +138,7 @@ router.get('/all', async (req, res) => {
 // 모든 근무 신청 조회 (GET /admin/events/requests)
 router.get('/requests', async (req, res) => {
     try {
-        const shiftRequests = await ShiftRequest.find({}).populate('workerId', 'name');
+        const shiftRequests = await ShiftRequest.find({}).populate('workerId', 'userName');
         res.status(200).json(shiftRequests);
     } catch (error) {
         console.error(error);
@@ -210,7 +210,21 @@ const selectWorkers = async (timeSlot, maxWorkers) => {
         }
     }
 
+
     return { selectedWorkers, rejectedWorkers };
+
+    // 선발된 근무자와 거절된 근무자를 필요한 형태로 반환
+    return {
+        selectedWorkers: selectedWorkers.map(worker => ({
+            userName: worker.userName,
+            score: worker.score
+        })),
+        rejectedWorkers: rejectedWorkers.map(worker => ({
+            userName: worker.userName,
+            score: worker.score
+        }))
+    };
+
 };
 
 // 근무자 선발 API

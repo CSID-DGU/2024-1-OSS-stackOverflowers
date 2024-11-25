@@ -3,7 +3,7 @@ import  mongoose from 'mongoose';
 
 const shiftRequestSchema = new mongoose.Schema({
     workerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Worker', required: true },//필수
-    name: { type: String, required: true }, //필수
+    userName: { type: String, required: true }, //필수
     start: { type: Date, required: true },//필수
     end: { type: Date, required: true },//필수
     lastShiftStart: { type: Date, required: true },//필수
