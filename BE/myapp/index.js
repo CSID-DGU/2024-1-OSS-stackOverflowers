@@ -13,6 +13,7 @@ import adminEventsRouter from './routes/adminEvents.js';
 import workerEventsRouter from './routes/workerEvents.js';
 import homeRouter from './routes/home.js';
 
+import cors from 'cors';
 
 // __dirname 설정 
 const __filename = fileURLToPath(import.meta.url);
@@ -65,6 +66,8 @@ app.get('/*', (req, res) => {
 const port = 3080;
 
 
+
+
 // MongoDB 연결
 mongoose.connect('mongodb://127.0.0.1:27017/shiftmate')
 .then(() => console.log('MongoDB 성공적으로 연결'))
@@ -74,6 +77,11 @@ app.listen(3080,()=>{
     console.log('Server is running on port 3080');
 });
 
+app.use(cors({
+    origin: 'http://localhost:3000', // 프론트엔드 주소
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+}));
 //블로그 화면구성 메인페이지 네비게이션바 풋터
 //블로그 CRUD 글작성,목록,상세페이지,수정,삭제
 //nodemon 설치 npm install nodemon -D
