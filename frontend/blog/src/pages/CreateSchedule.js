@@ -49,10 +49,10 @@ const CreateSchedule = () => {
     const title = prompt("근무명을 입력하세요:");
     if (title) {
       const newEvent = {
-        id: String(Date.now()),
+        id: `${Date.now()}-${Math.random()}`,
         title,
-        start: selectInfo.start,
-        end: selectInfo.end,
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
         allDay: false,
         backgroundColor: "#52b2d5"
       };
@@ -73,31 +73,70 @@ const CreateSchedule = () => {
     setEvents([]);
   };
 
-  const handleSaveSchedule = () => {
+  const handleSaveSchedule = async() => {
     // 저장할 근무표 데이터
-    const scheduleData = {
-      events,
-      startHour,
-      endHour,
-      timeUnit,
-      startDate,
-      endDate,
-      workers,
-      deadline,
-    };
-    localStorage.setItem("scheduleData", JSON.stringify(scheduleData));
-    alert("근무표가 저장되었습니다.");
+    try {
+      // deadline이 없는 경우 endDate를 deadline으로 사용
+      const scheduleDeadline = deadline || endDate;  
+      if (!scheduleDeadline) {
+        throw new Error('작성 기한을 설정해주세요.');
+      }
+      const scheduleData = {
+        events: events.map(event => ({   //모든 이벤트들을 SchedulData로 저장
+          title: event.title,
+          start: event.start.toLocaleString(),
+          end: event.end.toLocaleString(),
+          allDay: event.allDay || false,
+        })),
+        startHour,
+        endHour,
+        timeUnit,
+        startDate,
+        endDate,
+        workers,
+        deadline: new Date(scheduleDeadline).getTime()  // 수정된 부분
+      };
+      /* localStorage.setItem("scheduleData", JSON.stringify(scheduleData));
+      alert("근무표가 저장되었습니다.");
 
-    setEvents([]);
-    setStartHour("09:00");
-    setEndHour("23:00");
-    setTimeUnit(1);
-    setStartDate("");
-    setEndDate("");
-    setWorkers([]);
-    setDeadline("");
+      setEvents([]);
+      setStartHour("09:00");
+      setEndHour("23:00");
+      setTimeUnit(1);
+      setStartDate("");
+      setEndDate("");
+      setWorkers([]);
+      setDeadline(""); */
+      const response = await fetch('/admin/events/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scheduleData),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '근무표 저장에 실패했습니다.');
+      }
+  
+      alert("근무표가 저장되었습니다.");
+      setEvents([]);
+      setStartHour("09:00");
+      setEndHour("23:00");
+      setTimeUnit(1);
+      setStartDate("");
+      setEndDate("");
+      setWorkers([]);
+      setDeadline("");
+      
+    } catch (error) {
+      console.error('Schedule save error:', error);
+      alert(error.message);
+    }
+    
+  }
 
-  }; 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
   };
@@ -141,13 +180,13 @@ const CreateSchedule = () => {
         <div className="logo_home">ShiftMate</div>
         <nav>
           <ul className="nav-links">
-            <li><button className="main-button" onClick={() => { window.location.href = '/admin/main'; }}>홈</button></li>
+            <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
             <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
             <li><button className="main-button" onClick={() => navigate('/admin/events/all')}>근무표 조회</button></li>
           </ul>
         </nav>
         <div className="auth-buttons">
-        <button onClick={() => navigate('/home')}>로그아웃</button>
+          <button onClick={handleLogout}>로그아웃</button>
         </div>
       </header>
       <h1>근무표 생성</h1>

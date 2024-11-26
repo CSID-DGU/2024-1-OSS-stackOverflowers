@@ -18,7 +18,7 @@ import swaggerUi from 'swagger-ui-express'
 //import swaggerFile from './swagger-output.json';
 
 const require = createRequire(import.meta.url);
-const swaggerFile = require('./swagger-output.json');
+const swaggerFile = require('../../swagger-output.json');
 
 // __dirname 설정 
 const __filename = fileURLToPath(import.meta.url);
