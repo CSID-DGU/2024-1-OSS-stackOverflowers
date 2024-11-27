@@ -14,6 +14,16 @@ import workerEventsRouter from './routes/workerEvents.js';
 import homeRouter from './routes/home.js';
 
 
+import { createRequire } from 'module';
+import swaggerUi from 'swagger-ui-express'
+//import swaggerFile from './swagger-output.json';
+
+const require = createRequire(import.meta.url);
+const swaggerFile = require('../../swagger-output.json');
+
+import cors from 'cors';
+
+
 // __dirname 설정 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +40,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 //정적 파일 제공
 app.use(express.static('views'));
+
+//swagger
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 // event route 사용
 app.use('/admin/events', adminEventsRouter);
@@ -53,16 +66,17 @@ app.use('/admin', adminRouter); // api사용시 /admin붙이고 사용
 
 
 // 정적 파일 제공 (React 빌드 폴더, react실행시 nunjucks 필요없음)
-const buildPath = path.join(__dirname, '../../frontend/blog/src');//수정
+const buildPath = path.join(__dirname, '../../frontend/blog/build');//수정
 app.use(express.static(buildPath));        
 
 // React 빌드된 index.html 파일을 메인 엔트리로 제공
-
 app.get('/*', (req, res) => {
-    res.sendFile(path.join(buildPath, 'index.js')); //수정
+    res.sendFile(path.join(buildPath, 'index.html')); //수정
 });
 
 const port = 3080;
+
+
 
 
 // MongoDB 연결
@@ -74,6 +88,11 @@ app.listen(3080,()=>{
     console.log('Server is running on port 3080');
 });
 
+app.use(cors({
+    origin: 'http://localhost:3000', // 프론트엔드 주소
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+}));
 //블로그 화면구성 메인페이지 네비게이션바 풋터
 //블로그 CRUD 글작성,목록,상세페이지,수정,삭제
 //nodemon 설치 npm install nodemon -D
@@ -83,3 +102,5 @@ app.set("view engine", "ejs");
 app.set("views","./views");
 
 // react파일을 사용하면 njucks 엔진은 필요없음.
+
+ 

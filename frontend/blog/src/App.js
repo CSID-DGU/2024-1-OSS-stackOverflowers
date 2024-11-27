@@ -9,7 +9,8 @@ import WriteSchedule from './pages/WriteSchedule';
 import ViewSchedule_worker from './pages/ViewSchedule_worker';
 import ModifySchedule from './pages/ModifySchedule';
 import ViewSchedule_admin from './pages/ViewSchedule_admin';
-
+import Home_worker from './pages/Home_worker';
+import Home_admin from './pages/Home_admin';
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
         <Route path="/home/login" element={<Login />} />
         <Route path="/home/signup" element={<Signup />} />
         <Route path="/admin/events/create" element={<CreateSchedule />} /> {/* 근무표 생성 페이지 */}
+        <Route path="/worker/main" element={<Home_worker />} /> {/* worker main 페이지로 이동 */}
+        <Route path="/admin/main" element={<Home_admin />} /> {/* admin main 페이지로 이동 */}
         <Route path="/worker/events/all" element={<ViewSchedule_worker />} /> {/* 바로 ViewSchedule로 이동 */}
         <Route path="/worker/events/apply" element={<WriteSchedule />} /> {/* 바로 ViewSchedule로 이동 */}
         <Route path="/admin/events/all/" element={<ViewSchedule_admin />} /> {/* 바로 ViewSchedule로 이동 */}

@@ -13,7 +13,7 @@ export default function WriteSchedule() {
   const [selectedOption, setSelectedOption] = useState('');
   const [appliedEvents, setAppliedEvents] = useState({});
   const navigate = useNavigate();
-
+ 
 // useEffect 부분 수정
 useEffect(() => {
   const loadEvents = () => {

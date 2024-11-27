@@ -114,36 +114,19 @@ export default function ModifySchedule() {
   };
 
   return (
-    <div className="schedule-modify-container">
-      <header className="navbar">
-        <div className="logo_home">ShiftMate</div>
-        <nav>
-          <ul className="nav-links">
-            <li>
-              <button className="main-button" onClick={() => navigate("/home")}>
-                홈
-              </button>
-            </li>
-            <li>
-              <button
-                className="main-button"
-                onClick={() => navigate("/admin/events/create")}
-              >
-                근무표 생성
-              </button>
-            </li>
-            <li>
-              <button
-                className="main-button"
-                onClick={() => navigate("/admin/events/all")}
-              >
-                근무표 조회
-              </button>
-              
-            </li>
-          </ul>
-        </nav>
-        <div className="auth-buttons">
+    <>
+      <div className="schedule-view-container">
+        {/* 네비게이션 바 */}
+        <header className="navbar">
+          <div className="logo_home">ShiftMate</div>
+          <nav>
+            <ul className="nav-links">
+              <li><button className="main-button" onClick={() => { window.location.href = '/worker/main'; }}>홈</button></li>
+              <li><button className="main-button" onClick={() => navigate('/worker/events/create')}>근무표 생성</button></li>
+              <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
+            </ul>
+          </nav>
+          <div className="auth-buttons">
             <button onClick={() => navigate('/home')}>로그아웃</button>
           </div>
       </header>
@@ -187,5 +170,6 @@ export default function ModifySchedule() {
         />
       </div>
     </div>
+  </>
   );
 }

@@ -73,35 +73,59 @@ const CreateSchedule = () => {
     setEvents([]);
   };
 
-  const handleSaveSchedule = () => {
+
+  const handleSaveSchedule = async() => {
     // 저장할 근무표 데이터
-    const existingData = JSON.parse(localStorage.getItem("scheduleData")) || [];
-    const validExistingData = Array.isArray(existingData) ? existingData : [];
-    const newScheduleData = {
-      id: `${Date.now()}-${Math.random()}`,
-      events,
-      startHour,
-      endHour,
-      timeUnit,
-      startDate,
-      endDate,
-      workers,
-      deadline,
-    };
-    const updatedData = [...validExistingData, newScheduleData];
-    localStorage.setItem("scheduleData", JSON.stringify(updatedData));
-    alert("근무표가 저장되었습니다.");
+    try {
+      // deadline이 없는 경우 endDate를 deadline으로 사용
+      const scheduleDeadline = deadline || endDate;  
+      if (!scheduleDeadline) {
+        throw new Error('작성 기한을 설정해주세요.');
+      }
+      const scheduleData = {
+        events: events.map(event => ({   //모든 이벤트들을 SchedulData로 저장
+          title: event.title,
+          start: event.start.toLocaleString(),
+          end: event.end.toLocaleString(),
+          allDay: event.allDay || false,
+        })),
+        startHour,
+        endHour,
+        timeUnit,
+        startDate,
+        endDate,
+        workers,
+        deadline: new Date(scheduleDeadline).getTime()  // 수정된 부분
+      };
+      const response = await fetch('/admin/events/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scheduleData),
+      });
 
-    setEvents([]);
-    setStartHour("09:00");
-    setEndHour("23:00");
-    setTimeUnit(1);
-    setStartDate("");
-    setEndDate("");
-    setWorkers([]);
-    setDeadline("");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '근무표 저장에 실패했습니다.');
+      }
+  
+      alert("근무표가 저장되었습니다.");
+      setEvents([]);
+      setStartHour("09:00");
+      setEndHour("23:00");
+      setTimeUnit(1);
+      setStartDate("");
+      setEndDate("");
+      setWorkers([]);
+      setDeadline("");
+      
+    } catch (error) {
+      console.error('Schedule save error:', error);
+      alert(error.message);
+    }
+  };
 
-  }; 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
   };
