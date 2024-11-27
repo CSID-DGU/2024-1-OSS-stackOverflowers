@@ -73,13 +73,20 @@ const CreateSchedule = () => {
     setEvents([]);
   };
 
-  const handleSaveSchedule = async () => {
+
+  const handleSaveSchedule = async() => {
+    // 저장할 근무표 데이터
     try {
+      // deadline이 없는 경우 endDate를 deadline으로 사용
+      const scheduleDeadline = deadline || endDate;  
+      if (!scheduleDeadline) {
+        throw new Error('작성 기한을 설정해주세요.');
+      }
       const scheduleData = {
-        events: events.map(event => ({
+        events: events.map(event => ({   //모든 이벤트들을 SchedulData로 저장
           title: event.title,
-          start: event.start,
-          end: event.end,
+          start: event.start.toLocaleString(),
+          end: event.end.toLocaleString(),
           allDay: event.allDay || false,
         })),
         startHour,
@@ -88,9 +95,8 @@ const CreateSchedule = () => {
         startDate,
         endDate,
         workers,
-        deadline,
+        deadline: new Date(scheduleDeadline).getTime()  // 수정된 부분
       };
-
       const response = await fetch('/admin/events/create', {
         method: 'POST',
         headers: {
@@ -99,24 +105,27 @@ const CreateSchedule = () => {
         body: JSON.stringify(scheduleData),
       });
 
-      if (response.ok) {
-        alert("근무표가 저장되었습니다.");
-        setEvents([]);
-        setStartHour("09:00");
-        setEndHour("23:00");
-        setTimeUnit(1);
-        setStartDate("");
-        setEndDate("");
-        setWorkers([]);
-        setDeadline("");
-      } else {
-        throw new Error("근무표 저장에 실패했습니다.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '근무표 저장에 실패했습니다.');
       }
+  
+      alert("근무표가 저장되었습니다.");
+      setEvents([]);
+      setStartHour("09:00");
+      setEndHour("23:00");
+      setTimeUnit(1);
+      setStartDate("");
+      setEndDate("");
+      setWorkers([]);
+      setDeadline("");
+      
     } catch (error) {
       console.error('Schedule save error:', error);
-      alert("근무표 저장 중 오류가 발생했습니다.");
+      alert(error.message);
     }
   };
+
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
   };
