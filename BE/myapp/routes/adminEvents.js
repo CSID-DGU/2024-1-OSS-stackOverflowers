@@ -12,9 +12,15 @@ const router = express.Router();
 });
 
 // 이벤트 생성create (GET)
+
 router.get('/create', (req, res) => {
     res.render('CreateEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
 });
+
+// router.get('/create', (req, res) => {
+//     res.render('createEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
+// });
+
 
 // 이벤트 생성create (POST)
 router.post('/create', async (req, res) => {
@@ -185,32 +191,69 @@ router.get('/requests', async (req, res) => {
 
 
 // 근무자 선발 알고리즘 함수
-const selectWorkers = async () => {
-    const requests = await ShiftRequest.find({ status: 'Pending' });
-    const MAX_WORKERS = 3; // 근무자 최대 인원
-    // 점수 계산 및 정렬
+const selectWorkers = async (timeSlot, maxWorkers) => {
+    // 특정 시간대의 Pending 상태 신청 조회
+    const requests = await ShiftRequest.find({
+        status: 'Pending',
+        start: timeSlot.start,
+        end: timeSlot.end
+    });
+
+    // 우선순위 가중치
+    const priorityWeights = { 1: 4, 2: 2, 3: 0 }; // 1순위: +4, 2순위: +2, 3순위: +0
+
     const sortedRequests = requests
         .map(request => {
-            // 마지막 근무로부터 경과한 시간 (시간 단위)
             const hoursSinceLastShift = (new Date() - new Date(request.lastShiftEnd)) / (1000 * 60 * 60);
-
-            // 점수 계산: 마지막 근무 경과 시간 + 거절 횟수에 따른 가산점
-            const score = hoursSinceLastShift + request.rejections * 5;
+            const score = hoursSinceLastShift + request.rejections * 5 + priorityWeights[request.priority];
             return { ...request.toObject(), score };
         })
-        .sort((a, b) => b.score - a.score); // 높은 점수 순으로 정렬
+        .sort((a, b) => b.score - a.score); // 높은 점수 순 정렬
 
-    // 선발된 근무자와 거절된 근무자 분리
-    const selectedWorkers = sortedRequests.slice(0, MAX_WORKERS);
-    const rejectedWorkers = sortedRequests.slice(MAX_WORKERS);
+    const selectedWorkers = [];
+    const rejectedWorkers = [];
 
-    // 근무자 상태 업데이트
-    for (const worker of selectedWorkers) {
-        await ShiftRequest.findByIdAndUpdate(worker._id, { status: 'Approved' });
+    for (const request of sortedRequests) {
+        if (selectedWorkers.length < maxWorkers) {
+            // 채택된 근무자 처리
+            await ShiftRequest.findByIdAndUpdate(request._id, {
+                status: 'Approved',
+                priority: 1,
+                rejections: 0 // rejections 초기화
+            });
+
+            // 캘린더에 일정 저장
+            const newEvent = new Event({
+                title: `근무자: ${request.name}`,
+                start: request.start,
+                end: request.end,
+                description: request.description,
+                allDay: false
+            });
+            await newEvent.save();
+
+            selectedWorkers.push(request);
+        } else {
+            // 거절된 근무자 처리
+            if (request.priority < 3) {
+                // 1순위 -> 2순위, 2순위 -> 3순위로 변경
+                await ShiftRequest.findByIdAndUpdate(request._id, {
+                    priority: request.priority + 1,
+                    rejections: request.rejections + 1
+                });
+            } else {
+                // 최종 거절
+                await ShiftRequest.findByIdAndUpdate(request._id, {
+                    status: 'Rejected',
+                    rejections: request.rejections + 1
+                });
+                rejectedWorkers.push(request);
+            }
+        }
     }
-    for (const worker of rejectedWorkers) {
-        await ShiftRequest.findByIdAndUpdate(worker._id, { status: 'Rejected' });
-    }
+
+
+    return { selectedWorkers, rejectedWorkers };
 
     // 선발된 근무자와 거절된 근무자를 필요한 형태로 반환
     return {
@@ -223,6 +266,7 @@ const selectWorkers = async () => {
             score: worker.score
         }))
     };
+
 };
 
 // 근무자 선발 API
@@ -244,7 +288,7 @@ router.post('/approve', async (req, res) => {
 });
 
 
-//근무 신청 승인POST//
+//근무 신청 승인POST//(필요없음)
 router.post('/approve/:requestId', async (req, res) => {
 
     const MAX_WORKERS_PER_SHIFT = 3; // 근무자 최대 인원
@@ -277,7 +321,7 @@ router.post('/approve/:requestId', async (req, res) => {
     }
 });
 
-// 근무 신청 거절 (POST)
+// 근무 신청 거절 (POST)(필요없음)
 router.post('/reject/:requestId', async (req, res) => {
     try {
         const request = await ShiftRequest.findByIdAndUpdate(req.params.requestId, { status: 'Rejected' });

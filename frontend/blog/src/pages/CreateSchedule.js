@@ -73,6 +73,7 @@ const CreateSchedule = () => {
     setEvents([]);
   };
 
+
   const handleSaveSchedule = async() => {
     // 저장할 근무표 데이터
     try {
@@ -96,17 +97,6 @@ const CreateSchedule = () => {
         workers,
         deadline: new Date(scheduleDeadline).getTime()  // 수정된 부분
       };
-      /* localStorage.setItem("scheduleData", JSON.stringify(scheduleData));
-      alert("근무표가 저장되었습니다.");
-
-      setEvents([]);
-      setStartHour("09:00");
-      setEndHour("23:00");
-      setTimeUnit(1);
-      setStartDate("");
-      setEndDate("");
-      setWorkers([]);
-      setDeadline(""); */
       const response = await fetch('/admin/events/create', {
         method: 'POST',
         headers: {
@@ -114,7 +104,7 @@ const CreateSchedule = () => {
         },
         body: JSON.stringify(scheduleData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || '근무표 저장에 실패했습니다.');
@@ -134,8 +124,7 @@ const CreateSchedule = () => {
       console.error('Schedule save error:', error);
       alert(error.message);
     }
-    
-  }
+  };
 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);

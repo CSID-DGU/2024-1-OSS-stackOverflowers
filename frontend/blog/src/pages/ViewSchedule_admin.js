@@ -38,7 +38,7 @@ export default function ViewSchedule_admin() {
   };
 
   // 커스텀 버튼 렌더링 함수
-  const renderSaveButton = () => {
+  const renderEditButton = () => {
     return {
       text: '수정',
       click: handlerender,
@@ -140,7 +140,7 @@ const fetchEvents = (fetchInfo, successCallback, failureCallback) => {
             <ul className="nav-links">
               <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
               <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
-              <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
+              <li><button className="main-button" onClick={() => navigate('/admin/events/all')}>근무표 조회</button></li>
             </ul>
           </nav>
           <div className="auth-buttons">
@@ -158,10 +158,10 @@ const fetchEvents = (fetchInfo, successCallback, failureCallback) => {
             headerToolbar={{
               left: 'title',
               center: '',
-              right: 'saveButton,prev,next'  // 기존 버튼들과 함께 저장 버튼 추가
+              right: 'editButton,prev,next'  // 기존 버튼들과 함께 저장 버튼 추가
             }}
             customButtons={{
-              saveButton: renderSaveButton()  // 커스텀 버튼 정의
+              editButton: renderEditButton()  // 커스텀 버튼 정의
             }}
             locale={koLocale}
             slotDuration="00:30:00"
