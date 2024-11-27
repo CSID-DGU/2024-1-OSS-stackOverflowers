@@ -73,31 +73,56 @@ const CreateSchedule = () => {
     setEvents([]);
   };
 
-  const handleSaveSchedule = () => {
-    // 저장할 근무표 데이터
-    const scheduleData = {
-      events,
-      startHour,
-      endHour,
-      timeUnit,
-      startDate,
-      endDate,
-      workers,
-      deadline,
-    };
-    localStorage.setItem("scheduleData", JSON.stringify(scheduleData));
-    alert("근무표가 저장되었습니다.");
+  const handleSaveSchedule = async () => {
+    try {
+      if (!startDate || !endDate || events.length === 0) {
+        alert('필수 데이터가 누락되었습니다.');
+        return;
+      }
+      const scheduleData = {
+        events: events.map(event => ({
+          title: event.title,
+          start: new Date(event.start).toISOString(),
+          end: new Date(event.end).toISOString(),
+          allDay: event.allDay || false,
+        })),
+        startHour,
+        endHour,
+        timeUnit,
+        startDate,
+        endDate,
+        workers,
+        deadline,
+      };
 
-    setEvents([]);
-    setStartHour("09:00");
-    setEndHour("23:00");
-    setTimeUnit(1);
-    setStartDate("");
-    setEndDate("");
-    setWorkers([]);
-    setDeadline("");
+      console.log('저장할 데이터:', scheduleData);
 
-  }; 
+      const response = await fetch('/admin/events/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scheduleData),
+      });
+
+      if (response.ok) {
+        alert("근무표가 저장되었습니다.");
+        setEvents([]);
+        setStartHour("09:00");
+        setEndHour("23:00");
+        setTimeUnit(1);
+        setStartDate("");
+        setEndDate("");
+        setWorkers([]);
+        setDeadline("");
+      } else {
+        throw new Error("근무표 저장에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error('Schedule save error:', error);
+      alert("근무표 저장 중 오류가 발생했습니다.");
+    }
+  };
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
   };
@@ -147,7 +172,7 @@ const CreateSchedule = () => {
           </ul>
         </nav>
         <div className="auth-buttons">
-        <button onClick={() => navigate('/home')}>로그아웃</button>
+          <button onClick={handleLogout}>로그아웃</button>
         </div>
       </header>
       <h1>근무표 생성</h1>
