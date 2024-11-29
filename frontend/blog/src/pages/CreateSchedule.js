@@ -49,10 +49,10 @@ const CreateSchedule = () => {
     const title = prompt("근무명을 입력하세요:");
     if (title) {
       const newEvent = {
-        id: String(Date.now()),
+        id: `${Date.now()}-${Math.random()}`,
         title,
-        start: selectInfo.start,
-        end: selectInfo.end,
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
         allDay: false,
         backgroundColor: "#52b2d5"
       };
@@ -73,6 +73,7 @@ const CreateSchedule = () => {
     setEvents([]);
   };
 
+<<<<<<< HEAD
   const handleSaveSchedule = async () => {
     try {
       if (!startDate || !endDate || events.length === 0) {
@@ -84,6 +85,22 @@ const CreateSchedule = () => {
           title: event.title,
           start: new Date(event.start).toISOString(),
           end: new Date(event.end).toISOString(),
+=======
+
+  const handleSaveSchedule = async() => {
+    // 저장할 근무표 데이터
+    try {
+      // deadline이 없는 경우 endDate를 deadline으로 사용
+      const scheduleDeadline = deadline || endDate;  
+      if (!scheduleDeadline) {
+        throw new Error('작성 기한을 설정해주세요.');
+      }
+      const scheduleData = {
+        events: events.map(event => ({   //모든 이벤트들을 SchedulData로 저장
+          title: event.title,
+          start: event.start.toLocaleString(),
+          end: event.end.toLocaleString(),
+>>>>>>> 34e74e02e09f545054a718d42a25bda6d05d44b8
           allDay: event.allDay || false,
         })),
         startHour,
@@ -92,6 +109,7 @@ const CreateSchedule = () => {
         startDate,
         endDate,
         workers,
+<<<<<<< HEAD
         deadline,
       };
 
@@ -123,6 +141,40 @@ const CreateSchedule = () => {
       alert("근무표 저장 중 오류가 발생했습니다.");
     }
   };
+=======
+        deadline: new Date(scheduleDeadline).getTime()  // 수정된 부분
+      };
+      const response = await fetch('/admin/events/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scheduleData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '근무표 저장에 실패했습니다.');
+      }
+  
+      alert("근무표가 저장되었습니다.");
+      setEvents([]);
+      setStartHour("09:00");
+      setEndHour("23:00");
+      setTimeUnit(1);
+      setStartDate("");
+      setEndDate("");
+      setWorkers([]);
+      setDeadline("");
+      
+    } catch (error) {
+      console.error('Schedule save error:', error);
+      alert(error.message);
+    }
+
+  };
+
+>>>>>>> 34e74e02e09f545054a718d42a25bda6d05d44b8
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
   };
@@ -166,7 +218,7 @@ const CreateSchedule = () => {
         <div className="logo_home">ShiftMate</div>
         <nav>
           <ul className="nav-links">
-            <li><button className="main-button" onClick={() => { window.location.href = '/admin/main'; }}>홈</button></li>
+            <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
             <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
             <li><button className="main-button" onClick={() => navigate('/admin/events/all')}>근무표 조회</button></li>
           </ul>
