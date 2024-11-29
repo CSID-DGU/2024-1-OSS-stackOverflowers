@@ -16,19 +16,40 @@ export default function WriteSchedule() {
  
 // useEffect 부분 수정
 useEffect(() => {
-  const loadEvents = () => {
-    const fetchedEvents = eventsData.map((event) => ({
-      id: `${event.startTime}-${event.endTime}`,
-      title: event.name,
-      start: new Date(event.startTime),
-      end: new Date(event.endTime),
-      backgroundColor: '#FFFFFF',    // 기본 흰색 배경
-      textColor: '#000000',         // 검정색 텍스트
-      borderColor: '#d1d1d1'        // 회색 테두리
-    }));
-    setEvents(fetchedEvents);
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/worker/events/apply');
+      
+      if (!response.ok) {
+        throw new Error('근무 일정을 불러오는데 실패했습니다.');
+      }
+
+      const data = await response.json();
+      
+      const formattedEvents = data.map(event => ({
+        id: event._id,
+        title: event.title,
+        start: new Date(event.start),
+        end: new Date(event.end),
+        backgroundColor: '#FFFFFF',    // 기본 흰색 배경
+        textColor: '#000000',         // 검정색 텍스트
+        borderColor: '#d1d1d1',       // 회색 테두리
+        description: event.description,
+        allDay: event.allDay,
+
+      }));
+
+      setEvents(formattedEvents);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      setError(error.message);
+      setLoading(false);
+    }
   };
-  loadEvents();
+
+  fetchEvents();
 }, []);
 
 // updateEventStatus 함수 수정
