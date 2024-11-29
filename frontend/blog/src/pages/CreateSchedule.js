@@ -17,6 +17,9 @@ const CreateSchedule = () => {
   const [workerId, setWorkerId] = useState(""); // 근무자 ID 입력 상태
   const [workers, setWorkers] = useState([]); // 근무자 목록
   const [deadline, setDeadline] = useState("");
+  //근무자 선택 시 비교할 근무자/관리자 데이터 가져오기
+  const [existingWorkers, setExistingWorkers] = useState([]); // Workers DB 데이터
+  const [adminList, setAdminList] = useState([]); // Admin DB 데이터  
   const calendarRef = useRef(null);
   const navigate = useNavigate();
 
@@ -24,7 +27,7 @@ const CreateSchedule = () => {
   // 로그아웃 처리 함수 추가
   const handleLogout = async () => {
     try {
-      const response = await fetch('/auth/logout', {
+      const response = await fetch('/home/logout', {
         method: 'POST',
         credentials: 'include'
       });
@@ -91,6 +94,34 @@ const CreateSchedule = () => {
         alert("근무표를 신청할 수 있는 근무자 아이디를 추가해주세요.");
         return;
       }
+      
+       // Workers DB에 없는 경우
+       const isValidWorker = workers.every(workerId => 
+        existingWorkers.some(worker => worker.id === workerId)
+      );
+
+      if (!isValidWorker) {
+        alert("존재하지 않는 근무자입니다.");
+        return;
+      }
+
+      // 중복 선택된 경우
+      const uniqueWorkers = new Set(workers);
+      if (uniqueWorkers.size !== workers.length) {
+        alert("이미 선택된 근무자입니다.");
+        return;
+      }
+
+      // Admin DB에 있는 경우
+      const isAdmin = workers.some(workerId => 
+        adminList.some(admin => admin.id === workerId)
+      );
+
+      if (isAdmin) {
+        alert("관리자는 근무자로 선택할 수 없습니다.");
+        return;
+      }
+
       const scheduleData = {
         events: events.map(event => ({   //모든 이벤트들을 SchedulData로 저장
           title: event.title,
@@ -156,13 +187,84 @@ const CreateSchedule = () => {
     }
   };
 
-  const handleWorkerAdd = () => {
-    if (workerId && !workers.includes(workerId)) {
-      setWorkers((prevWorkers) => [...prevWorkers, workerId]);
-      setWorkerId(""); // 입력 필드 초기화
-    } else {
-      alert("중복된 근무자 ID거나 빈 값을 입력했습니다.");
+  //근무자/관리자 데이터 가져오기
+  const handleWorkersDataLoad = async () => {
+    try {
+      const response = await fetch('/worker/getinfo', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Workers 데이터 로드에 실패했습니다.');
+      }
+  
+      const workersData = await response.json();
+      setExistingWorkers(workersData);
+    } catch (error) {
+      console.error('Workers 데이터 로드 실패:', error);
     }
+  };
+  
+  const handleAdminDataLoad = async () => {
+    try {
+      const response = await fetch('/admin/getinfo', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Admin 데이터 로드에 실패했습니다.');
+      }
+  
+      const adminData = await response.json();
+      setAdminList(adminData);
+    } catch (error) {
+      console.error('Admin 데이터 로드 실패:', error);
+    }
+  };
+
+  // useEffect를 추가하여 컴포넌트가 마운트될 때 데이터를 로드
+  useEffect(() => {
+    handleWorkersDataLoad();
+    handleAdminDataLoad();
+  }, []);
+
+  //근무자 id 추가 시 검증 함수 수정!
+  const handleWorkerAdd = () => {
+    if (!workerId) {
+      alert("근무자 ID를 입력해주세요.");
+      return;
+    }
+  
+    // Worker DB에 존재하는지 확인 / Admin DB에 존재하는지 확인
+    const workerExists = existingWorkers.some(worker => worker.id === workerId);
+    const isAdmin = adminList.some(admin => admin.id === workerId);
+    if (isAdmin) {
+      alert("관리자는 근무자로 선택할 수 없습니다. 다른 ID를 입력해주세요.");
+      setWorkerId("");
+      return;
+    }
+    else if (!workerExists) {
+      alert("존재하지 않는 근무자입니다. 다시 확인해주세요.");
+      setWorkerId("");
+      return;
+    }
+
+    // 이미 선택된 근무자인지 확인
+    if (workers.includes(workerId)) {
+      alert("이미 선택된 근무자입니다. 다른 근무자를 선택해주세요.");
+      setWorkerId("");
+      return;
+    }
+  
+    // 모든 검증을 통과한 경우에만 근무자 추가
+    setWorkers(prevWorkers => [...prevWorkers, workerId]);
+    setWorkerId(""); // 입력 필드 초기화
   };
 
   const handleWorkerRemove = (id) => {

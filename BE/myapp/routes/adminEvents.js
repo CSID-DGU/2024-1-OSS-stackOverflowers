@@ -2,49 +2,62 @@
 import express from 'express';
 import Event from '../models/Event.js'; // 이벤트 모델 참조 (모델 위치에 따라 경로 조정)
 import ShiftRequest from '../models/ShiftRequest.js';
+import Schedule from '../models/Schedule.js';
 
 const router = express.Router();
 
 // 이벤트 생성create (GET)
 router.get('/create', (req, res) => {
-    res.render('createEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
+    res.render('CreateEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
 });
 
 // 이벤트 생성create (POST)
 router.post('/create', async (req, res) => {
-    const { title, start, end, description,allDay } = req.body;
-    
-     // 입력 데이터 유효성 검사
-    if (!title || !start || !end) {
-        return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
-    }
-
-
-     // 날짜 형식 유효성 검사
-     const startDate = new Date(start);
-     const endDate = new Date(end);
-     
-     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-         return res.status(400).json({ message: '유효한 날짜와 시간을 입력해주세요.' });
-     }
-
-     const newEvent = new Event({
-        title,
-        start: startDate,
-        end: endDate,
-        description,
-        allDay: allDay || false
-    });
-
     try {
-        await newEvent.save();
-        console.log('Event created successfully');
-        res.status(201).json({ message: 'Event created successfully', event: newEvent });
+        const {events, startDate, endDate, workers, timeUnit, startHour, endHour, deadline} = req.body;
+        
+        // 유효성 검사
+        if (!events || !events.length) {
+            return res.status(400).json({ message: '최소 하나 이상의 이벤트가 필요합니다.' });
+        }
+       
+        // 이벤트 배열 생성
+        const eventDocuments = await Promise.all(events.map(async (event) => {
+            const newEvent = new Event({
+                title: event.title,
+                start: event.start,
+                end: event.end,
+                allDay: event.allDay || false
+            });
+            await newEvent.save();
+            return newEvent;
+        }));
+
+        // 새로운 스케줄 생성
+        const newSchedule = new Schedule({
+            events: eventDocuments.map(event => event._id), // 이벤트 참조 저장
+            startDate,
+            endDate,
+            workers,
+            timeUnit,
+            startHour,
+            endHour,
+            deadline
+        });
+
+        await newSchedule.save();
+        
+        console.log('Schedule created successfully');
+        res.status(201).json({ 
+            message: 'Schedule created successfully', 
+            schedule: newSchedule 
+        });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Failed to create event' });
+        console.error('Schedule creation error:', error);
+        res.status(500).json({ message: 'Failed to create schedule' });
     }
-});
+}); 
 
 
 
