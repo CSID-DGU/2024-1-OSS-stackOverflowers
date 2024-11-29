@@ -73,34 +73,29 @@ const CreateSchedule = () => {
     setEvents([]);
   };
 
-<<<<<<< HEAD
-  const handleSaveSchedule = async () => {
-    try {
-      if (!startDate || !endDate || events.length === 0) {
-        alert('필수 데이터가 누락되었습니다.');
-        return;
-      }
-      const scheduleData = {
-        events: events.map(event => ({
-          title: event.title,
-          start: new Date(event.start).toISOString(),
-          end: new Date(event.end).toISOString(),
-=======
 
   const handleSaveSchedule = async() => {
     // 저장할 근무표 데이터
     try {
-      // deadline이 없는 경우 endDate를 deadline으로 사용
-      const scheduleDeadline = deadline || endDate;  
-      if (!scheduleDeadline) {
-        throw new Error('작성 기한을 설정해주세요.');
+      //신청기한 및 근무자 설정이 완료되어야지만 저장할 수 있게 함
+      if (!deadline) {
+        if (workers.length === 0) {
+          alert("신청 기한과 근무자를 설정해주세요.");
+          return;
+        }
+        alert("신청 기한을 설정해주세요.");
+        return;
+      }
+  
+      if (workers.length === 0) {
+        alert("근무표를 신청할 수 있는 근무자 아이디를 추가해주세요.");
+        return;
       }
       const scheduleData = {
         events: events.map(event => ({   //모든 이벤트들을 SchedulData로 저장
           title: event.title,
           start: event.start.toLocaleString(),
           end: event.end.toLocaleString(),
->>>>>>> 34e74e02e09f545054a718d42a25bda6d05d44b8
           allDay: event.allDay || false,
         })),
         startHour,
@@ -109,40 +104,7 @@ const CreateSchedule = () => {
         startDate,
         endDate,
         workers,
-<<<<<<< HEAD
-        deadline,
-      };
-
-      console.log('저장할 데이터:', scheduleData);
-
-      const response = await fetch('/admin/events/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(scheduleData),
-      });
-
-      if (response.ok) {
-        alert("근무표가 저장되었습니다.");
-        setEvents([]);
-        setStartHour("09:00");
-        setEndHour("23:00");
-        setTimeUnit(1);
-        setStartDate("");
-        setEndDate("");
-        setWorkers([]);
-        setDeadline("");
-      } else {
-        throw new Error("근무표 저장에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error('Schedule save error:', error);
-      alert("근무표 저장 중 오류가 발생했습니다.");
-    }
-  };
-=======
-        deadline: new Date(scheduleDeadline).getTime()  // 수정된 부분
+        deadline: new Date(deadline).getTime()
       };
       const response = await fetch('/admin/events/create', {
         method: 'POST',
@@ -174,7 +136,6 @@ const CreateSchedule = () => {
 
   };
 
->>>>>>> 34e74e02e09f545054a718d42a25bda6d05d44b8
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
   };
@@ -184,7 +145,15 @@ const CreateSchedule = () => {
   };
 
   const handleDeadlineChange = (e) => {
-    setDeadline(e.target.value); // 작성 기한 변경
+    const newDeadline = e.target.value;
+  
+    // `deadline`이 `startDate`보다 늦으면 경고를 띄우고 초기화
+    if (new Date(newDeadline) >= new Date(startDate)) {
+      alert("신청 기한은 시작일보다 빠른 날짜여야 합니다.");
+      setDeadline(""); // `deadline` 초기화
+    } else {
+      setDeadline(newDeadline); // 유효한 경우에만 업데이트
+    }
   };
 
   const handleWorkerAdd = () => {
@@ -349,9 +318,15 @@ const CreateSchedule = () => {
               
             </div>
             <div className="deadline-container">
-                <label htmlFor="deadline">작성기한: </label>
-                <input type="date" id="deadline" name="deadline" />
-              </div>
+              <label htmlFor="deadline">신청기한: </label>
+                <input
+                  type="date"
+                  id="deadline"
+                  name="deadline"
+                  value={deadline}
+                  onChange={handleDeadlineChange} // 함수 연결
+                />
+            </div>
           </>
         ) : (
           <p>시작일과 종료일을 모두 선택하세요.</p>
