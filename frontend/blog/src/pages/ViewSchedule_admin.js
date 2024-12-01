@@ -19,8 +19,11 @@ export default function ViewSchedule_admin() {
   }, []);
 
   const handlerender = () => {
-    // 다른 페이지로 이동
-    navigate('/admin/events/edit/');
+    if (calendarEl.current) {
+      const calendarApi = calendarEl.current.getApi();
+      const currentRange = calendarApi.view.activeStart; // 현재 주간의 시작 날짜
+      navigate('/admin/events/edit', { state: { start: currentRange } });
+    }
   };
 
   // 커스텀 버튼 렌더링 함수
