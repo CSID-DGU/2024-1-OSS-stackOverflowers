@@ -82,10 +82,22 @@ export default function WriteSchedule() {
       const scheduleData = Object.entries(appliedEvents).map(([eventId, priority]) => {
         const event = events.find(e => e.id === eventId);
         return {
+          id: event.id,
+          title: event.title, // 근무명
           start: event.start,
           end: event.end,
-          priority: priority
-        };
+          description: `${priority} 신청`, // 우선순위 정보를 설명에 추가
+          allDay: false,
+          extendedProps: {
+            scheduleId: event.extendedProps?.scheduleId,
+            workerId: localStorage.getItem('workerId'), 
+            workerName: localStorage.getItem('userName'), 
+            priority: priority, 
+            timeUnit: event.extendedProps?.timeUnit, 
+            startHour: event.extendedProps?.startHour, 
+            endHour: event.extendedProps?.endHour, 
+          }
+        }
       });
 
       const response = await fetch('/worker/events/apply', {
