@@ -295,7 +295,7 @@ const updateEventStatus = (eventId, priority = null) => {
                 headerToolbar={{
                   left:'',
                   center: 'title',
-                  right: ''
+                  right: 'prev,next'
                 }}
                 slotDuration="00:30:00"
                 events={events}
