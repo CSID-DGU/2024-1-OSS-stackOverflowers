@@ -36,6 +36,90 @@ export default function WriteSchedule() {
     loadEvents();
   }, []);
 
+  // 근무 신청 조건 확인 함수
+  const validateScheduleApplications = () => {
+    // 우선순위별 신청 횟수 계산
+    const priorityApplications = Object.values(appliedEvents).reduce((acc, priority) => {
+      acc[priority] = (acc[priority] || 0) + 1;
+      return acc;
+    }, {});
+
+    const errors = [];
+
+    // 1순위 확인
+    if (!priorityApplications['1순위'] || priorityApplications['1순위'] !== 1) {
+      errors.push('1순위 근무를 신청해주세요.');
+    }
+
+    // 2순위 확인 (정확히 1개)
+    else if (!priorityApplications['2순위'] || priorityApplications['2순위'] !== 1) {
+      errors.push('2순위 근무를 신청해주세요.');
+    }
+
+    // 3순위 확인 (1개 이상)
+    else if (!priorityApplications['3순위'] || priorityApplications['3순위'] < 1) {
+      errors.push('3순위 근무를 신청해주세요.');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors: errors
+    };
+  };
+
+  // 저장 버튼 핸들러
+  const handleSaveSchedule = async () => {
+    try {
+      // 근무 신청 조건 확인
+      const validation = validateScheduleApplications();
+      
+      if (!validation.isValid) {
+        alert(`${validation.errors.join('\n')}`);
+        return;
+      }
+
+      // appliedEvents에서 신청된 근무 일정 데이터 추출
+      const scheduleData = Object.entries(appliedEvents).map(([eventId, priority]) => {
+        const event = events.find(e => e.id === eventId);
+        return {
+          start: event.start,
+          end: event.end,
+          priority: priority
+        };
+      });
+
+      const response = await fetch('/worker/events/apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ scheduleData }),
+      });
+
+      if (!response.ok) {
+        throw new Error('근무 신청 저장에 실패했습니다.');
+      }
+
+      const result = await response.json();
+      alert('근무 신청이 완료되었습니다.');
+      //navigate('/worker/events/all'); // 저장 후 조회 페이지로 이동
+    } catch (error) {
+      console.error('Save error:', error);
+      alert(error.message);
+    }
+  };
+
+
+    // 저장 버튼 렌더링 함수
+    const renderSaveButton = () => {
+      return {
+        text: '저장',
+        click: handleSaveSchedule,
+        className: 'fc-button-primary'
+      };
+    };
+  
+
   // 우선순위 제한 확인 함수
   const checkPriorityLimit = (priority) => {
     if (priority === '1순위' && priorityCounts['1순위'] >= 1) {
@@ -329,7 +413,10 @@ export default function WriteSchedule() {
               headerToolbar={{
                 left: '',
                 center: 'title',
-                right: 'prev,next'
+                right: 'saveButton,prev,next' // 저장 버튼 추가
+              }}
+              customButtons={{
+                saveButton: renderSaveButton() // 커스텀 버튼 정의
               }}
               slotDuration="00:30:00"
               events={events}
