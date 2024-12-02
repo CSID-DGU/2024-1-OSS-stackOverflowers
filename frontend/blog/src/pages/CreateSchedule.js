@@ -376,8 +376,8 @@ const CreateSchedule = () => {
                   center: "title",
                   right: "",
                 }}
-                slotMinTime={startHour} // 시작 시간
-                slotMaxTime={endHour} // 종료 시간
+                slotMinTime={`${startHour}:00`}
+                slotMaxTime={`${endHour}:00`}
                 slotDuration={`${timeUnit === 1 ? "01:00" : "00:30"}`} // 시간 단위
                 slotLabelInterval="00:30:00"
                 allDaySlot={false}
@@ -393,7 +393,7 @@ const CreateSchedule = () => {
                   minute: '2-digit',
                   hour12: false, // 24시간 형식
                 }}
-                height="90%" // 높이를 자동으로 조절
+                height="auto" // 높이를 자동으로 조절
                 locale={koLocale}
               />
             </div>
