@@ -4,6 +4,8 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import koLocale from "@fullcalendar/core/locales/ko";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
 import "./ModifySchedule.css";
 import "./nav_schedule.css";
 
@@ -13,41 +15,8 @@ export default function ModifySchedule() {
   const [events, setEvents] = useState([]); // 현재 표시되는 이벤트 데이터
   const [scheduleList, setScheduleList] = useState([]); // 로컬스토리지의 모든 근무표 데이터
   const [currentRange, setCurrentRange] = useState({ start: null, end: null }); // 현재 캘린더 범위
-
-  useEffect(() => {
-    // 로컬스토리지에서 데이터 불러오기
-    const storedData = JSON.parse(localStorage.getItem("scheduleData")) || [];
-    console.log("Loaded scheduleData from localStorage:", storedData);
-
-    if (Array.isArray(storedData) && storedData.length > 0) {
-      setScheduleList(storedData);
-    } else {
-      console.warn("No valid schedule data found in localStorage.");
-      setScheduleList([]);
-    }
-  }, []);
-
-  // 현재 범위와 일치하는 근무표 데이터를 불러오는 함수
-  const loadEventsForCurrentRange = (range) => {
-    if (!range.start || !range.end || scheduleList.length === 0) return;
-
-    const matchingSchedule = scheduleList.find(
-      (schedule) =>
-        new Date(schedule.startDate) <= new Date(range.end) &&
-        new Date(schedule.endDate) >= new Date(range.start)
-    );
-
-    if (matchingSchedule) {
-      setEvents(matchingSchedule.events || []);
-    } else {
-      setEvents([]); // 해당 범위에 맞는 근무표가 없으면 빈 배열
-    }
-  };
-
-  useEffect(() => {
-    // currentRange가 변경될 때마다 해당 범위에 맞는 근무표 데이터 로드
-    loadEventsForCurrentRange(currentRange);
-  }, [currentRange, scheduleList]);
+  const location = useLocation();
+  const initialDate = location.state?.start || new Date();
 
   const handleEventAdd = (selectInfo) => {
     const title = prompt("근무명을 입력하세요:");
@@ -61,12 +30,14 @@ export default function ModifySchedule() {
       };
 
       setEvents((prevEvents) => [...prevEvents, newEvent]);
+
     }
   };
 
   const handleEventRemove = (clickInfo) => {
     if (window.confirm(`${clickInfo.event.title} 일정을 삭제하시겠습니까?`)) {
       const eventId = clickInfo.event.id;
+
 
       setEvents((prevEvents) =>
         prevEvents.filter((event) => event.id !== eventId)
@@ -75,7 +46,7 @@ export default function ModifySchedule() {
       clickInfo.event.remove();
     }
   };
-
+  
   const handleReset = () => {
     if (window.confirm("모든 근무 일정을 초기화하시겠습니까?")) {
       setEvents([]);
@@ -121,7 +92,7 @@ export default function ModifySchedule() {
           <div className="logo_home">ShiftMate</div>
           <nav>
             <ul className="nav-links">
-              <li><button className="main-button" onClick={() => { window.location.href = '/worker/main'; }}>홈</button></li>
+              <li><button className="main-button" onClick={() => { window.location.href = '/admin/main'; }}>홈</button></li>
               <li><button className="main-button" onClick={() => navigate('/worker/events/create')}>근무표 생성</button></li>
               <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
             </ul>
@@ -133,7 +104,9 @@ export default function ModifySchedule() {
 
       <h1>근무표 수정</h1>
 
-      <div className="modify-calendar-container">
+
+      <div className="modify-calendar-container" style={{ height: '80vh', width: '90vw', margin: '0 auto' }}>
+
         <FullCalendar
           ref={calendarEl}
           plugins={[timeGridPlugin, interactionPlugin]}
@@ -142,6 +115,8 @@ export default function ModifySchedule() {
           selectable={true}
           editable={true}
           events={events}
+          initialDate={initialDate}
+
           select={(selectInfo) => {
             handleEventAdd(selectInfo);
             calendarEl.current.getApi().unselect();
@@ -166,7 +141,8 @@ export default function ModifySchedule() {
             minute: "2-digit",
             hour12: false,
           }}
-          height="auto"
+          height="80%"
+
         />
       </div>
     </div>

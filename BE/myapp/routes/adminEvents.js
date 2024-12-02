@@ -2,8 +2,10 @@
 import express from 'express';
 import Event from '../models/Event.js'; // 이벤트 모델 참조 (모델 위치에 따라 경로 조정)
 import ShiftRequest from '../models/ShiftRequest.js';
+
+import Schedule from '../models/Schedule.js';
 import Worker from '../models/Worker.js'; // Worker 스키마 참조
-import Schedule from '../models/Schedule.js';  // Schedule 모델 임포트 추가
+
 
 const router = express.Router();
 
@@ -70,7 +72,6 @@ router.post('/create', async (req, res) => {
         res.status(500).json({ message: 'Failed to create schedule' });
     }
 }); 
-
 
 
 

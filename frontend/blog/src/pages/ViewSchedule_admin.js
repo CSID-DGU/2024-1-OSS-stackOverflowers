@@ -30,10 +30,10 @@ export default function ViewSchedule_admin() {
 
 
   const handlerender = () => {
-    if (currentSchedule) {
-      navigate(`/admin/events/edit/${currentSchedule._id}`);
-    } else {
-      alert('수정할 스케줄을 선택해주세요.');
+    if (calendarEl.current) {
+      const calendarApi = calendarEl.current.getApi();
+      const currentRange = calendarApi.view.activeStart; // 현재 주간의 시작 날짜
+      navigate('/admin/events/edit', { state: { start: currentRange } });
     }
   };
 
@@ -138,7 +138,7 @@ const fetchEvents = (fetchInfo, successCallback, failureCallback) => {
           <div className="logo_home">ShiftMate</div>
           <nav>
             <ul className="nav-links">
-              <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
+              <li><button className="main-button" onClick={() => { window.location.href = '/admin/main'; }}>홈</button></li>
               <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
               <li><button className="main-button" onClick={() => navigate('/admin/events/all')}>근무표 조회</button></li>
             </ul>

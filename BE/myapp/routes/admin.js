@@ -18,4 +18,24 @@ router.get('/main', (req, res) => {
     res.render('Home_admin')
 });
 
+// 모든 Admin 데이터 가져오기
+router.get('/getinfo', async (req, res) => {
+    try {
+      const admins = await Admin.find({}, { 
+        id: 1, 
+        userName: 1, 
+        phone: 1,
+        _id: 0 
+      });
+      
+      res.json(admins);
+    } catch (error) {
+      console.error('Admins 데이터 조회 오류:', error);
+      res.status(500).json({ 
+        message: "Admins 데이터를 불러오는데 실패했습니다.",
+        error: error.message 
+      });
+    }
+  });
+  
 export default router;

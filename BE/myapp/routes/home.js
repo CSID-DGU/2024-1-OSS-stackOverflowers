@@ -3,6 +3,16 @@ import Admin from '../models/Admin.js';
 import Worker from '../models/Worker.js';
 const router = express.Router();
 
+// 세션 확인 미들웨어 정의
+const checkSession = (req, res, next) => {
+    console.log('Session:', req.session); // 세션 상태 로깅
+    if (req.session && req.session.userId) {
+      next();
+    } else {
+      res.status(401).json({ message: "세션이 만료되었습니다." });
+    }
+  };
+
 // 통합 회원가입
 router.post('/signup', async (req, res) => {
     try {
@@ -77,7 +87,7 @@ router.post('/login', async (req, res) => {
 });
 
 // 로그아웃 라우트 추가
-router.post('/logout', (req, res) => {
+router.post('/logout',checkSession, (req, res) => {
     try {
         if (req.session) {
             req.session.destroy((err) => {

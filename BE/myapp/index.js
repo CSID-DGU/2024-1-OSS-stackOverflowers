@@ -35,20 +35,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-//미들웨어 실행
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-//정적 파일 제공
-app.use(express.static('views'));
-
-//swagger
-app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile))
-
-// event route 사용
-app.use('/admin/events', adminEventsRouter);
-app.use('/worker/events', workerEventsRouter);
-app.use('/home', homeRouter);
-
 // session 미들웨어를 다른 미들웨어보다 먼저 설정
 app.use(session({
     secret: 'your-secret-key',
@@ -60,6 +46,19 @@ app.use(session({
     }
 }));
 
+
+//미들웨어 실행
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+//정적 파일 제공
+app.use(express.static('views'));
+
+//swagger
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile))
+// event route 사용
+app.use('/admin/events', adminEventsRouter);
+app.use('/worker/events', workerEventsRouter);
+app.use('/home', homeRouter);
 // 근무자, 관리자 라우터 설정
 app.use('/worker', workerRouter); // api사용시 /worker붙이고 사용
 app.use('/admin', adminRouter); // api사용시 /admin붙이고 사용
