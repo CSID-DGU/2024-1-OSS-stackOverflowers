@@ -77,8 +77,8 @@ export default function ViewSchedule_admin() {
             initialView="timeGridWeek"
             height="80%"
             headerToolbar={{
-              left: 'title',
-              center: '',
+              left: '',
+              center: 'title',
               right: 'saveButton,prev,next'  // 기존 버튼들과 함께 저장 버튼 추가
             }}
             customButtons={{
