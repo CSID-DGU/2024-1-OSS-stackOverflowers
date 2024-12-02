@@ -20,6 +20,19 @@ const workerSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    rejections: { // 거절 횟수
+        type: Number,
+        default: 0
+    },
+    // 마지막 근무날짜 및 시간 업데이트
+    lastShiftStart: { // 마지막 근무 시작 시간
+        type: Date,
+        default: null
+    },
+    lastShiftEnd: { // 마지막 근무 종료 시간
+        type: Date,
+        default: null
+    },
     
 }, {
     timestamps: true

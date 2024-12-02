@@ -1,36 +1,46 @@
-    
-  .schedule-write-container h1 {
-    text-align: center;
-    margin-top: 20px;
-  }
-  .write_main-content {
-    padding: 30px 40px; /* 좌우에 20px 간격 추가 */
-  }
+.schedule-write-container h1 {
+  text-align: center;
+  margin-top: 20px;
+}
 
-  .priority_dropdown {
-    width: 200px; /* 고정 너비 설정 */
-    float: left; /* 왼쪽에 배치 */
-    margin: 50px; /* 캘린더와의 간격 조정 */
-  }
-  
-  .write_calendar-container {
-    width: calc(100% - 240px); /* 남은 너비를 사용하여 캘린더가 더 넓게 표시되도록 설정 */
-    margin: 20px;
-    overflow-y: auto;
-  }
-  .fc .fc-day {
-    background-color: #d3d3d3; 
-  }
-  
-  .fc-day-today {
-    background-color: #d3d3d3 !important; 
-  }
-  
-  .fc .fc-col-header-cell {
-    background-color: #ffffff !important; 
-  }
+.write_main-content {
+  display: flex;  /* Flexbox 사용 */
+  flex-direction: row;  /* 가로 방향으로 배치 */
+  padding: 30px 40px;
+  gap: 20px;  /* 요소들 사이의 간격 */
+}
+
+.priority_dropdown {
+  width: 200px;  /* 드롭다운 영역의 너비 */
+  flex-shrink: 0;  /* 크기 고정 */
+  margin-top: 50px;  /* 상단 여백 */
+}
+
+.priority_dropdown select {
+  width: 100%;
+  margin-top: 10px;
+  margin-left: 3px;
+  padding: 8px;
+  height: 40px;
+}
+
+.write_calendar-container {
+  flex: 1;  /* 남은 공간 모두 차지 */
+  min-width: 0;  /* Flexbox 버그 방지 */
+}
+
+.fc .fc-day {
+  background-color: #d3d3d3; 
+}
+
+.fc-day-today {
+  background-color: #d3d3d3 !important; 
+}
+
+.fc .fc-col-header-cell {
+  background-color: #ffffff !important; 
+}
 
 .whiteBackground .fc-timegrid-slot {
-    background-color: #ffffff !important; 
-  }
-  
+  background-color: #ffffff !important; 
+}

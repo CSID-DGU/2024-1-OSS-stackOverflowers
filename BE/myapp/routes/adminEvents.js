@@ -2,49 +2,65 @@
 import express from 'express';
 import Event from '../models/Event.js'; // 이벤트 모델 참조 (모델 위치에 따라 경로 조정)
 import ShiftRequest from '../models/ShiftRequest.js';
+import Worker from '../models/Worker.js'; // Worker 스키마 참조
+import Schedule from '../models/Schedule.js';  // Schedule 모델 임포트 추가
 
 const router = express.Router();
 
-// 이벤트 생성create (GET)
+// 이벤트 생성 (GET)
 router.get('/create', (req, res) => {
-    res.render('createEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
+const router = express.Router();
 });
+
 
 // 이벤트 생성create (POST)
 router.post('/create', async (req, res) => {
-    const { title, start, end, description,allDay } = req.body;
-    
-     // 입력 데이터 유효성 검사
-    if (!title || !start || !end) {
-        return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
-    }
-
-
-     // 날짜 형식 유효성 검사
-     const startDate = new Date(start);
-     const endDate = new Date(end);
-     
-     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-         return res.status(400).json({ message: '유효한 날짜와 시간을 입력해주세요.' });
-     }
-
-     const newEvent = new Event({
-        title,
-        start: startDate,
-        end: endDate,
-        description,
-        allDay: allDay || false
-    });
-
     try {
-        await newEvent.save();
-        console.log('Event created successfully');
-        res.status(201).json({ message: 'Event created successfully', event: newEvent });
+        const {events, startDate, endDate, workers, timeUnit, startHour, endHour, deadline} = req.body;
+        
+        // 유효성 검사
+        if (!events || !events.length) {
+            return res.status(400).json({ message: '최소 하나 이상의 이벤트가 필요합니다.' });
+        }
+
+        // 이벤트 배열 생성
+        const eventDocuments = await Promise.all(events.map(async (event) => {
+            const newEvent = new Event({
+                title: event.title,
+                start: event.start,
+                end: event.end,
+                allDay: event.allDay || false
+            });
+            await newEvent.save();
+            return newEvent;
+        }));
+
+        // 새로운 스케줄 생성
+        const newSchedule = new Schedule({
+            events: eventDocuments.map(event => event._id), // 이벤트 참조 저장
+            startDate,
+            endDate,
+            workers,
+            timeUnit,
+            startHour,
+            endHour,
+            deadline
+        });
+
+        await newSchedule.save();
+        
+        console.log('Schedule created successfully');
+        res.status(201).json({ 
+            message: 'Schedule created successfully', 
+            schedule: newSchedule 
+        });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Failed to create event' });
+        console.error('Schedule creation error:', error);
+        res.status(500).json({ message: 'Failed to create schedule' });
     }
-});
+}); 
+
 
 
 
@@ -114,20 +130,37 @@ router.post('/delete/:id', async (req, res) => {
     }
 });
 
+router.get('/all', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/blog/build/index.html'));
+});
 
 // 이벤트 조회 API
 router.get('/all', async (req, res) => {
     try {
-        const events = await Event.find({});
-    // FullCalendar 형식에 맞게 데이터 가공
-        const formattedEvents = events.map(event => ({
-            id: event._id,
-            title: event.title,
-            start: event.start,
-            end: event.end,
-            description: event.description,
-            allDay: event.allDay
-        }));
+        // Schedule 데이터를 조회하고 events 필드의 Event 정보도 함께 가져옴
+        const schedules = await Schedule.find({})
+            .populate('events')  // events 배열의 Event 문서들을 가져옴
+            .exec();
+    
+        // 모든 스케줄의 이벤트들을 FullCalendar 형식으로 변환
+        const formattedEvents = schedules.flatMap(schedule => {
+            return schedule.events.map(event => ({
+                id: event._id,
+                title: event.title,
+                start: event.start,
+                end: event.end,
+                description: event.description,
+                allDay: event.allDay,
+                // 스케줄 관련 추가 정보
+                scheduleId: schedule._id,
+                workers: schedule.workers,
+                timeUnit: schedule.timeUnit,
+                startHour: schedule.startHour,
+                endHour: schedule.endHour,
+                deadline: schedule.deadline
+            }));
+        });
+    
         res.json(formattedEvents);
     } catch (error) {
         console.error(error);
@@ -148,25 +181,44 @@ router.get('/requests', async (req, res) => {
 
 
 
+
+
 // 근무자 선발 알고리즘 함수
-const selectWorkers = async () => {
-    const requests = await ShiftRequest.find({ status: 'Pending' });
-    const MAX_WORKERS = 3; // 근무자 최대 인원
-    // 점수 계산 및 정렬
+const selectWorkers = async (timeSlot, maxWorkers) => {
+    // 특정 시간대의 Pending 상태 신청 조회
+    const requests = await ShiftRequest.find({
+        status: 'Pending',
+        start: timeSlot.start,
+        end: timeSlot.end
+    });
+
+    // 우선순위 가중치
+    const priorityWeights = { 1: 4, 2: 2, 3: 0 }; // 1순위: +4, 2순위: +2, 3순위: +0
     const sortedRequests = requests
         .map(request => {
-            // 마지막 근무로부터 경과한 시간 (시간 단위)
             const hoursSinceLastShift = (new Date() - new Date(request.lastShiftEnd)) / (1000 * 60 * 60);
+            // 우선순위에 따른 가중치 추가
+            score += priorityWeights[request.priority];
 
             // 점수 계산: 마지막 근무 경과 시간 + 거절 횟수에 따른 가산점
-            const score = hoursSinceLastShift + request.rejections * 5;
+            let score = hoursSinceLastShift + request.rejections * 5 + priorityWeights[request.priority];;
+
             return { ...request.toObject(), score };
         })
-        .sort((a, b) => b.score - a.score); // 높은 점수 순으로 정렬
+        .sort((a, b) => b.score - a.score); // 높은 점수 순 정렬
 
-    // 선발된 근무자와 거절된 근무자 분리
-    const selectedWorkers = sortedRequests.slice(0, MAX_WORKERS);
-    const rejectedWorkers = sortedRequests.slice(MAX_WORKERS);
+    const selectedWorkers = [];
+    const rejectedWorkers = [];
+
+
+    // 거절된 근무자 중 1순위가 있다면 해당 우선순위를 2로 변경
+    for (const worker of rejectedWorkers) {
+        if (worker.priority === 1) {
+            await ShiftRequest.findByIdAndUpdate(worker._id, { priority: 2 });
+        } else if (worker.priority === 2) {
+            await ShiftRequest.findByIdAndUpdate(worker._id, { priority: 3 });
+        }
+    }
 
     // 근무자 상태 업데이트
     for (const worker of selectedWorkers) {
@@ -174,6 +226,44 @@ const selectWorkers = async () => {
     }
     for (const worker of rejectedWorkers) {
         await ShiftRequest.findByIdAndUpdate(worker._id, { status: 'Rejected' });
+
+    for (const request of sortedRequests) {
+        if (selectedWorkers.length < maxWorkers) {
+            // 채택된 근무자 처리
+            await ShiftRequest.findByIdAndUpdate(request._id, {
+                status: 'Approved',
+                priority: 1,
+                rejections: 0 // rejections 초기화
+            });
+
+            // 캘린더에 일정 저장
+            const newEvent = new Event({
+                title: `근무자: ${request.name}`,
+                start: request.start,
+                end: request.end,
+                description: request.description,
+                allDay: false
+            });
+            await newEvent.save();
+
+            selectedWorkers.push(request);
+        } else {
+            // 거절된 근무자 처리
+            if (request.priority < 3) {
+                // 1순위 -> 2순위, 2순위 -> 3순위로 변경
+                await ShiftRequest.findByIdAndUpdate(request._id, {
+                    priority: request.priority + 1,
+                    rejections: request.rejections + 1
+                });
+            } else {
+                // 최종 거절
+                await ShiftRequest.findByIdAndUpdate(request._id, {
+                    status: 'Rejected',
+                    rejections: request.rejections + 1
+                });
+                rejectedWorkers.push(request);
+            }
+        }
     }
 
     // 선발된 근무자와 거절된 근무자를 필요한 형태로 반환
@@ -187,6 +277,8 @@ const selectWorkers = async () => {
             score: worker.score
         }))
     };
+
+};
 };
 
 // 근무자 선발 API
@@ -208,15 +300,7 @@ router.post('/approve', async (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
-//근무 신청 승인POST//
+//근무 신청 승인POST//(필요없음)
 router.post('/approve/:requestId', async (req, res) => {
 
     const MAX_WORKERS_PER_SHIFT = 3; // 근무자 최대 인원
@@ -249,19 +333,29 @@ router.post('/approve/:requestId', async (req, res) => {
     }
 });
 
-// 근무 신청 거절 (POST)
+// 근무 신청 거절 (POST)(필요없음)
 router.post('/reject/:requestId', async (req, res) => {
     try {
-        const request = await ShiftRequest.findByIdAndUpdate(req.params.requestId, { status: 'Rejected' });
+        // 신청 ID로 근무 신청 조회
+        const request = await ShiftRequest.findById(req.params.requestId);
         if (!request) {
             return res.status(404).json({ message: 'Request not found' });
         }
-        res.status(200).json({ message: 'Request rejected successfully' });
+
+        // Worker 컬렉션에서 거절 횟수 업데이트
+        await Worker.findByIdAndUpdate(
+            request.workerId,
+            { $inc: { rejections: 1 } } // rejections 필드 +1
+        );
+
+        // 근무 신청 삭제
+        await ShiftRequest.findByIdAndDelete(req.params.requestId);
+
+        res.status(200).json({ message: 'Request rejected and worker updated' });
     } catch (error) {
-        console.error(error);
+        console.error('Failed to reject request:', error);
         res.status(500).json({ message: 'Failed to reject request' });
     }
 });
-
 
 export default router;

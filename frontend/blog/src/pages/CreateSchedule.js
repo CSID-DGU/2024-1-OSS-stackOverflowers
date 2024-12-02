@@ -90,6 +90,10 @@ const CreateSchedule = () => {
       if (workers.length === 0) {
         alert("근무표를 신청할 수 있는 근무자 아이디를 추가해주세요.");
         return;
+      // deadline이 없는 경우 endDate를 deadline으로 사용
+      const scheduleDeadline = deadline || endDate;  
+      if (!scheduleDeadline) {
+        throw new Error('작성 기한을 설정해주세요.');
       }
       const scheduleData = {
         events: events.map(event => ({   //모든 이벤트들을 SchedulData로 저장
@@ -104,7 +108,7 @@ const CreateSchedule = () => {
         startDate,
         endDate,
         workers,
-        deadline: new Date(deadline).getTime()
+        deadline: new Date(scheduleDeadline).getTime()  // 수정된 부분
       };
       const response = await fetch('/admin/events/create', {
         method: 'POST',
@@ -133,7 +137,6 @@ const CreateSchedule = () => {
       console.error('Schedule save error:', error);
       alert(error.message);
     }
-
   };
 
   const handleStartDateChange = (e) => {
