@@ -77,19 +77,6 @@ const CreateSchedule = () => {
   const handleSaveSchedule = async() => {
     // 저장할 근무표 데이터
     try {
-      //신청기한 및 근무자 설정이 완료되어야지만 저장할 수 있게 함
-      if (!deadline) {
-        if (workers.length === 0) {
-          alert("신청 기한과 근무자를 설정해주세요.");
-          return;
-        }
-        alert("신청 기한을 설정해주세요.");
-        return;
-      }
-  
-      if (workers.length === 0) {
-        alert("근무표를 신청할 수 있는 근무자 아이디를 추가해주세요.");
-        return;
       // deadline이 없는 경우 endDate를 deadline으로 사용
       const scheduleDeadline = deadline || endDate;  
       if (!scheduleDeadline) {
@@ -148,15 +135,7 @@ const CreateSchedule = () => {
   };
 
   const handleDeadlineChange = (e) => {
-    const newDeadline = e.target.value;
-  
-    // `deadline`이 `startDate`보다 늦으면 경고를 띄우고 초기화
-    if (new Date(newDeadline) >= new Date(startDate)) {
-      alert("신청 기한은 시작일보다 빠른 날짜여야 합니다.");
-      setDeadline(""); // `deadline` 초기화
-    } else {
-      setDeadline(newDeadline); // 유효한 경우에만 업데이트
-    }
+    setDeadline(e.target.value); // 작성 기한 변경
   };
 
   const handleWorkerAdd = () => {
@@ -321,15 +300,9 @@ const CreateSchedule = () => {
               
             </div>
             <div className="deadline-container">
-              <label htmlFor="deadline">신청기한: </label>
-                <input
-                  type="date"
-                  id="deadline"
-                  name="deadline"
-                  value={deadline}
-                  onChange={handleDeadlineChange} // 함수 연결
-                />
-            </div>
+                <label htmlFor="deadline">작성기한: </label>
+                <input type="date" id="deadline" name="deadline" />
+              </div>
           </>
         ) : (
           <p>시작일과 종료일을 모두 선택하세요.</p>

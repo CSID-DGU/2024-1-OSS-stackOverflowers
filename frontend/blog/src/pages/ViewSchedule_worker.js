@@ -18,39 +18,21 @@ const calendarEl = useRef(null);
     }
   }, []);
 
-// 이벤트 fetch 함수
-const fetchEvents = async () => {
-  try {
-    if (!startDate || !endDate) {
-      setEvents([]);
-      return;
+  const fetchEvents = (fetchInfo, successCallback, failureCallback) => {
+    try {
+      const events = eventsData.map(event => ({
+        title: `${event.worker}`,
+        start: event.startTime,
+        end: event.endTime,
+        backgroundColor: "#52b2d5"
+      }));
+  
+      successCallback(events);
+    } catch (error) {
+      console.error('Failed to load events:', error);
+      failureCallback(error);
     }
-
-    const response = await fetch('/worker/events/all');
-    if (!response.ok) {
-      throw new Error('스케줄을 불러오는데 실패했습니다.');
-    }
-    
-    const data = await response.json();
-    
-    const formattedEvents = data.map(event => ({
-      id: event._id,
-      title: event.title,
-      start: new Date(event.start),
-      end: new Date(event.end),
-      description: event.description,
-      allDay: event.allDay,
-      backgroundColor: "#52b2d5"
-    }));
-    
-    setEvents(formattedEvents);
-    setLoading(false);
-  } catch (error) {
-    console.error('Error fetching events:', error);
-    setError(error.message);
-    setLoading(false);
-  }
-};
+  };  
   
 return (
     <>
