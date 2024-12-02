@@ -38,8 +38,15 @@ app.use(cookieParser());
 //미들웨어 실행
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+
 //정적 파일 제공
-app.use(express.static('views'));
+// React 정적 파일 제공 설정
+app.use(express.static(path.join(__dirname, '../frontend/blog/build')));
+
+// React 앱의 모든 라우트를 처리
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/blog/build/index.html'));
+});
 
 //swagger
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile))
@@ -80,7 +87,10 @@ const port = 3080;
 
 
 // MongoDB 연결
-mongoose.connect('mongodb://127.0.0.1:27017/shiftmate')
+const uri = 'mongodb+srv://kehahahaaaa:lkurM1cusnyKH7Lm@shiftmate.ggjs2.mongodb.net/?retryWrites=true&w=majority&appName=Shiftmate';
+mongoose.connect(uri,{
+
+})
 .then(() => console.log('MongoDB 성공적으로 연결'))
 .catch(err => console.error('MongoDB 연결 중 에러가 발생:', err));
 

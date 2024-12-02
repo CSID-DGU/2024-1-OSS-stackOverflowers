@@ -12,16 +12,6 @@ router.get('/create', (req, res) => {
 const router = express.Router();
 });
 
-// 이벤트 생성create (GET)
-
-router.get('/create', (req, res) => {
-    res.render('CreateEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
-});
-
-// router.get('/create', (req, res) => {
-//     res.render('createEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
-// });
-
 
 // 이벤트 생성create (POST)
 router.post('/create', async (req, res) => {
@@ -141,35 +131,35 @@ router.post('/delete/:id', async (req, res) => {
 });
 
 router.get('/all', (req, res) => {
-    res.render('ViewSchedule_admin'); // 이벤트 생성 페이지 템플릿을 렌더링
+    res.sendFile(path.join(__dirname, '../frontend/blog/build/index.html'));
 });
 
 // 이벤트 조회 API
 router.get('/all', async (req, res) => {
     try {
-                // Schedule 데이터를 조회하고 events 필드의 Event 정보도 함께 가져옴
-                const schedules = await Schedule.find({})
-                .populate('events')  // events 배열의 Event 문서들을 가져옴
-                .exec();
+        // Schedule 데이터를 조회하고 events 필드의 Event 정보도 함께 가져옴
+        const schedules = await Schedule.find({})
+            .populate('events')  // events 배열의 Event 문서들을 가져옴
+            .exec();
     
-            // 모든 스케줄의 이벤트들을 FullCalendar 형식으로 변환
-            const formattedEvents = schedules.flatMap(schedule => {
-                return schedule.events.map(event => ({
-                    id: event._id,
-                    title: event.title,
-                    start: event.start,
-                    end: event.end,
-                    description: event.description,
-                    allDay: event.allDay,
-                    // 스케줄 관련 추가 정보
-                    scheduleId: schedule._id,
-                    workers: schedule.workers,
-                    timeUnit: schedule.timeUnit,
-                    startHour: schedule.startHour,
-                    endHour: schedule.endHour,
-                    deadline: schedule.deadline
-                }));
-            });
+        // 모든 스케줄의 이벤트들을 FullCalendar 형식으로 변환
+        const formattedEvents = schedules.flatMap(schedule => {
+            return schedule.events.map(event => ({
+                id: event._id,
+                title: event.title,
+                start: event.start,
+                end: event.end,
+                description: event.description,
+                allDay: event.allDay,
+                // 스케줄 관련 추가 정보
+                scheduleId: schedule._id,
+                workers: schedule.workers,
+                timeUnit: schedule.timeUnit,
+                startHour: schedule.startHour,
+                endHour: schedule.endHour,
+                deadline: schedule.deadline
+            }));
+        });
     
         res.json(formattedEvents);
     } catch (error) {
