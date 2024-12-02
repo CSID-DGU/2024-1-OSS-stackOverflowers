@@ -20,21 +20,72 @@ export default function WriteSchedule() {
   });
   const navigate = useNavigate();
  
-  useEffect(() => {
-    const loadEvents = () => {
-      const fetchedEvents = eventsData.map((event) => ({
-        id: `${event.startTime}-${event.endTime}`,
-        title: event.name,
-        start: new Date(event.startTime),
-        end: new Date(event.endTime),
-        backgroundColor: '#FFFFFF',
-        textColor: '#000000',
-        borderColor: '#d1d1d1'
+// useEffect 부분 수정
+useEffect(() => {
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/worker/events/apply');
+      
+      if (!response.ok) {
+        throw new Error('근무 일정을 불러오는데 실패했습니다.');
+      }
+
+      const data = await response.json();
+      
+      const formattedEvents = data.map(event => ({
+        id: event._id,
+        title: event.title,
+        start: new Date(event.start),
+        end: new Date(event.end),
+        backgroundColor: '#FFFFFF',    // 기본 흰색 배경
+        textColor: '#000000',         // 검정색 텍스트
+        borderColor: '#d1d1d1',       // 회색 테두리
+        description: event.description,
+        allDay: event.allDay,
+
       }));
-      setEvents(fetchedEvents);
-    };
-    loadEvents();
-  }, []);
+
+      setEvents(formattedEvents);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  fetchEvents();
+}, []);
+
+// updateEventStatus 함수 수정
+const updateEventStatus = (eventId, priority = null) => {
+  setEvents(prevEvents =>
+    prevEvents.map(event => {
+      if (event.id === eventId) {
+        const originalName = event.title.split(' (')[0];
+        let backgroundColor;
+        let textColor;
+        
+        // 더 뚜렷한 색상 차이를 준 우선순위별 색상
+        switch(priority) {
+          case '1순위':
+            backgroundColor = '#023c52'; // 매우 진한 파랑
+            textColor = '#FFFFFF';
+            break;
+          case '2순위':
+            backgroundColor = '#0094c9'; // 선명한 파랑
+            textColor = '#FFFFFF';
+            break;
+          case '3순위':
+            backgroundColor = '#b7ecff'; // 밝은 파랑
+            textColor = '#000000';       // 밝은 배경색에는 검정색 텍스트
+            break;
+          default:
+            backgroundColor = '#FFFFFF'; // 흰색 배경
+            textColor = '#000000';      // 검정색 텍스트
+            break;
+        }
 
   // 근무 신청 조건 확인 함수
   const validateScheduleApplications = () => {
