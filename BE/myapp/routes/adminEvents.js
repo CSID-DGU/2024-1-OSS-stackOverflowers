@@ -12,16 +12,6 @@ router.get('/create', (req, res) => {
 const router = express.Router();
 });
 
-// 이벤트 생성create (GET)
-
-router.get('/create', (req, res) => {
-    res.render('CreateEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
-});
-
-// router.get('/create', (req, res) => {
-//     res.render('createEvent'); // 이벤트 생성 페이지 템플릿을 렌더링
-// });
-
 
 // 이벤트 생성create (POST)
 router.post('/create', async (req, res) => {
