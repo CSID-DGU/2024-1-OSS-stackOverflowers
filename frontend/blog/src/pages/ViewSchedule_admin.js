@@ -59,7 +59,7 @@ export default function ViewSchedule_admin() {
           <div className="logo_home">ShiftMate</div>
           <nav>
             <ul className="nav-links">
-              <li><button className="main-button" onClick={() => { window.location.href = '/home'; }}>홈</button></li>
+              <li><button className="main-button" onClick={() => { window.location.href = '/admin/main'; }}>홈</button></li>
               <li><button className="main-button" onClick={() => navigate('/admin/events/create')}>근무표 생성</button></li>
               <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
             </ul>

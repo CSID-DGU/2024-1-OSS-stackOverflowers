@@ -43,7 +43,7 @@ return (
         <nav>
           <ul className="nav-links">
             <li><button className="main-button" onClick={() => { window.location.href = '/worker/main'; }}>홈</button></li>
-            <li><button className="main-button" onClick={() => navigate('/worker/events/apply')}>근무표 작성</button></li>
+            <li><button className="main-button" onClick={() => navigate('/worker/events/apply')}>근무표 신청</button></li>
             <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
           </ul>
         </nav>
