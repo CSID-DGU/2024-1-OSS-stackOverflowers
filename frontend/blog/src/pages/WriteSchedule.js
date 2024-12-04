@@ -19,7 +19,8 @@ export default function WriteSchedule() {
     '3순위': 0
   });
   const navigate = useNavigate();
- 
+ /*
+ --------evnet.json에서 불러오는 코드-----------
   useEffect(() => {
     const loadEvents = () => {
       const fetchedEvents = eventsData.map((event) => ({
@@ -35,6 +36,46 @@ export default function WriteSchedule() {
     };
     loadEvents();
   }, []);
+*/
+
+// WorkerEvents.js
+router.get('/worker/events/apply', async (req, res) => {
+  try {
+      // workerId를 세션에서 가져옴
+      const workerId = req.session.userId;
+      
+      // Schedule 컬렉션에서 이 worker가 포함된 스케줄을 찾음
+      const schedules = await Schedule.find({ 
+          workers: workerId 
+      }).populate('events');
+
+      // FullCalendar 형식으로 이벤트 변환
+      const formattedEvents = schedules.flatMap(schedule => {
+          return schedule.events.map(event => ({
+              id: event._id,
+              title: event.title,
+              start: event.start,
+              end: event.end,
+              description: event.description,
+              allDay: event.allDay,
+              backgroundColor: "#52b2d5",
+              extendedProps: {
+                  scheduleId: schedule._id,
+                  workers: schedule.workers,
+                  timeUnit: schedule.timeUnit, 
+                  startHour: schedule.startHour,
+                  endHour: schedule.endHour,
+                  deadline: schedule.deadline
+              }
+          }));
+      });
+
+      res.json(formattedEvents);
+  } catch (error) {
+      console.error('Error fetching events:', error);
+      res.status(500).json({ message: 'Failed to retrieve events' });
+  }
+});
 
   // 근무 신청 조건 확인 함수
   const validateScheduleApplications = () => {
