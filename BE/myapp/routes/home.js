@@ -53,13 +53,18 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { id, password, userType } = req.body;
-        
+        console.log('Login attempt:', { id, userType }); // 로그인 시도 정보 출력
+        console.log('Session before:', req.session); // 세션 초기 상태 확인
+
         const Model = userType === 'admin' ? Admin : Worker;
         const user = await Model.findOne({ id });
         
         if (!user) {
+            console.log('User not found');
             return res.status(404).json({ message: "존재하지 않는 회원입니다." });
         }
+
+        console.log('User found:', user._id); // 찾은 사용자 정보 출력
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
@@ -74,6 +79,20 @@ router.post('/login', async (req, res) => {
             req.session.userType = userType;
         }
         
+        // 세션 저장 확인을 위한 Promise 래핑
+        await new Promise((resolve, reject) => {
+            req.session.save((err) => {
+                if (err) {
+                    console.error('Session save error:', err);
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+
+        console.log('Session after:', req.session); // 최종 세션 상태 확인
+
         const redirectUrl = userType === 'admin' ? '/admin/main' : '/worker/main';
         
         res.status(200).json({ 
@@ -114,4 +133,21 @@ router.post('/logout',checkSession, (req, res) => {
         });
     }
 });
-export default router;
+
+router.get('/session', (req, res) => {
+    console.log('세션 요청 받음:', req.session);
+    
+    if (req.session && req.session.id) {  // userId 대신 id 사용
+      res.json({
+        userId: req.session.id,     // MongoDB의 id 필드와 매칭
+        userType: req.session.userType,
+        userName: req.session.name  // userName 대신 name 사용
+      });
+    } else {
+      res.status(401).json({ 
+        message: '세션이 없거나 만료되었습니다.' 
+      });
+    }
+});
+
+  export default router;

@@ -20,6 +20,7 @@
     "express-session": "^1.18.1",
     "mongoose": "^8.7.2",
     "myapp": "file:",
+    "node-cron": "^3.0.3",
     "nunjucks": "^3.2.4"
   },
   "devDependencies": {

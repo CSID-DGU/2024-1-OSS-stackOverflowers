@@ -6,11 +6,12 @@ const shiftRequestSchema = new mongoose.Schema({
     userName: { type: String, required: true }, //필수
     start: { type: Date, required: true },//필수
     end: { type: Date, required: true },//필수
-    lastShiftStart: { type: Date, required: true },//필수
-    lastShiftEnd: { type: Date, required: true },//필수
+    lastShiftStart: { type: Date, required: true, default: new Date('2024-12-01T00:00:00.000Z')},//필수
+    lastShiftEnd: { type: Date, required: true, default: new Date('2024-12-01T00:00:00.000Z')},//필수
     status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
     description: String,
     rejections: { type: Number, default: 0 },
+    priority: { type: Number, enum: [1, 2, 3], default: 1 }, // 우선순위 필드 추가
     createdAt: { type: Date, default: Date.now }
 });
 

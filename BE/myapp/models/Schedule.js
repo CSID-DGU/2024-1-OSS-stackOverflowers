@@ -15,7 +15,7 @@ const ScheduleSchema = new Schema({
       type: Date,
       required: true
     },
-    workers: [{   //근무자
+    workers: [{   //해당 일정에 알고리즘을 돌릴 근무자
       type: String,
       required: true
     }],
@@ -40,9 +40,16 @@ const ScheduleSchema = new Schema({
       default: Date.now
     },
     selectionStatus: {
-      type: Boolean,
-      default: false,
+      type: String, 
+      enum: ['Pending', 'Completed', 'Error'], default: 'Pending' 
     },
+    lastProcessed: Date,
+    lastError: String,
+    maxWorkersPerShift: {
+      type: Number,
+      required: true,
+      default: 3,
+    }
   });
 
   export default mongoose.model('Schedule', ScheduleSchema);
