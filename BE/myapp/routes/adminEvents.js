@@ -5,12 +5,16 @@ import ShiftRequest from '../models/ShiftRequest.js';
 import Worker from '../models/Worker.js'; // Worker 스키마 참조
 import Schedule from '../models/Schedule.js';  // Schedule 모델 임포트 추가
 
+ 
+
 const router = express.Router();
 
 // 이벤트 생성 (GET)
-router.get('/create', (req, res) => {
-const router = express.Router();
-});
+// router.get('/create', (req, res) => {
+// const router = express.Router();
+// });
+
+
 
 
 // 이벤트 생성create (POST)
@@ -129,11 +133,11 @@ router.post('/delete/:id', async (req, res) => {
         res.status(500).json({ message: 'Failed to delete event' });
     }
 });
-
+////////////////////
 router.get('/all', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/blog/build/index.html'));
+    res.sendFile(path.join('../frontend/blog/build/index.html'));
 });
-
+////////////////////
 // 이벤트 조회 API
 router.get('/all', async (req, res) => {
     try {
@@ -180,7 +184,31 @@ router.get('/requests', async (req, res) => {
 });
 
 
+// 🟥 새로운 엔드포인트 추가: 마감시간 체크 및 selectWorkers 실행
+router.post('/check-deadline', async (req, res) => {
+    try {
+        const { deadline, timeSlot, maxWorkers } = req.body;
 
+        const currentTime = new Date();
+        const deadlineTime = new Date(deadline);
+
+        if (currentTime > deadlineTime) {
+            console.log('기한 초과. Running selectWorkers...');
+            const { selectedWorkers, rejectedWorkers } = await selectWorkers(timeSlot, maxWorkers);
+
+            res.status(200).json({
+                message: '근무자 배정완료(기한 지남).',
+                selectedWorkers,
+                rejectedWorkers,
+            });
+        } else {
+            res.status(200).json({ message: '기한이 지나지 않았습니다. No action taken.' });
+        }
+    } catch (error) {
+        console.error('Deadline check error:', error);
+        res.status(500).json({ message: 'Failed to check deadline and select workers' });
+    }
+});
 
 
 // 근무자 선발 알고리즘 함수

@@ -73,7 +73,7 @@ app.use('/admin', adminRouter); // api사용시 /admin붙이고 사용
 
 
 // 정적 파일 제공 (React 빌드 폴더, react실행시 nunjucks 필요없음)
-const buildPath = path.join(__dirname, '../../frontend/blog/build');//수정
+const buildPath = path.join(__dirname, '../frontend/blog/build');//수정
 app.use(express.static(buildPath));        
 
 // React 빌드된 index.html 파일을 메인 엔트리로 제공
@@ -87,12 +87,12 @@ const port = 3080;
 
 
 // MongoDB 연결
-const uri = 'mongodb+srv://kehahahaaaa:lkurM1cusnyKH7Lm@shiftmate.ggjs2.mongodb.net/?retryWrites=true&w=majority&appName=Shiftmate';
-mongoose.connect(uri,{
+const uri = 'mongodb+srv://kehahahaaaa:dbstjrrb0107@shiftmatedb.ggjs2.mongodb.net/?retryWrites=true&w=majority';
 
-})
-.then(() => console.log('MongoDB 성공적으로 연결'))
-.catch(err => console.error('MongoDB 연결 중 에러가 발생:', err));
+mongoose.connect(uri)
+    .then(() => console.log('MongoDB connected successfully'))
+    .catch((error) => console.error('MongoDB connection error:', error));
+
 
 app.listen(3080,()=>{
     console.log('Server is running on port 3080');
