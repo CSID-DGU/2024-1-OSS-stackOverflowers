@@ -73,7 +73,7 @@ const port = 3080;
 
 
 // MongoDB 연결
-mongoose.connect('mongodb://127.0.0.1:27017/shiftmate')
+mongoose.connect('mongodb+srv://kehahahaaaa:dbstjrrb0107@shiftmatedb.ggjs2.mongodb.net/?retryWrites=true&w=majority')
 .then(() => console.log('MongoDB 성공적으로 연결'))
 .catch(err => console.error('MongoDB 연결 중 에러가 발생:', err));
 
