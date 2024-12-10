@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import eventsData from './data/event.json';
 import './WriteSchedule.css';
 import { useNavigate } from 'react-router-dom';
 import koLocale from '@fullcalendar/core/locales/ko';
@@ -12,7 +11,6 @@ export default function WriteSchedule() {
   const [events, setEvents] = useState([]);
   const [selectedOption, setSelectedOption] = useState('');
   const [appliedEvents, setAppliedEvents] = useState({});
-  // 우선순위별 신청 횟수를 추적하기 위한 상태 추가
   const [priorityCounts, setPriorityCounts] = useState({
     '1순위': 0,
     '2순위': 0,
@@ -22,28 +20,113 @@ export default function WriteSchedule() {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // 데이터 로드 부분
-  useEffect(() => {
-  const loadEvents = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('/worker/events/apply');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  const loadEvents = async () => { 
+    setIsLoading(true); 
+    try { 
+      const sessionResponse = await fetch('/home/session');
+      const sessionData = await sessionResponse.json();
+      
+      if (!sessionData.userId) {
+        throw new Error('세션 정보를 찾을 수 없습니다.');
       }
-      const data = await response.json();
-      setEvents(data.events);
-      setScheduleInfo(data.schedule);
-    } catch (error) {
-      console.error('스케줄 로딩 에러:', error);
-      alert('스케줄을 불러오는데 실패했습니다.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  loadEvents();
-}, []);
 
+      // 기본 스케줄 데이터 로드 
+      const response = await fetch('/worker/events/apply'); 
+      if (!response.ok) { 
+        throw new Error(`HTTP error! status: ${response.status}`); 
+      } 
+      const data = await response.json(); 
+
+      // 사용자의 기존 신청 내역 로드
+      const shiftResponse = await fetch(`/worker/events/apply/${sessionData.userId}`); 
+      if (shiftResponse.ok) { 
+        const shiftData = await shiftResponse.json(); 
+        
+        // 우선순위 카운트 초기화
+        const newPriorityCounts = {
+          '1순위': 0,
+          '2순위': 0,
+          '3순위': 0
+        };
+        
+        const newAppliedEvents = {};
+        
+        // 이벤트와 신청 내역 매칭 
+        const updatedEvents = data.events.map(event => { 
+          const existingApplication = shiftData.find(app =>  
+            new Date(app.start).getTime() === new Date(event.start).getTime() 
+          ); 
+
+          if (existingApplication) { 
+            const priority = `${existingApplication.priority}순위`; 
+            let backgroundColor; 
+            let textColor; 
+            
+            switch(priority) { 
+              case '1순위': 
+                backgroundColor = '#023c52'; 
+                textColor = '#FFFFFF'; 
+                break; 
+              case '2순위': 
+                backgroundColor = '#0094c9'; 
+                textColor = '#FFFFFF'; 
+                break; 
+              case '3순위': 
+                backgroundColor = '#b7ecff'; 
+                textColor = '#000000'; 
+                break; 
+              default: 
+                backgroundColor = '#FFFFFF'; 
+                textColor = '#000000'; 
+            } 
+
+            // 우선순위 카운트 업데이트
+            newPriorityCounts[priority]++;
+            
+            // appliedEvents 업데이트
+            newAppliedEvents[event.id] = priority;
+
+            return { 
+              ...event, 
+              backgroundColor, 
+              textColor, 
+              title: `${event.title} (${priority})`, 
+              borderColor: '#d1d1d1' 
+            }; 
+          } 
+          return { 
+            ...event, 
+            backgroundColor: '#FFFFFF', 
+            textColor: '#000000', 
+            borderColor: '#d1d1d1' 
+          }; 
+        }); 
+
+        setEvents(updatedEvents);
+        setPriorityCounts(newPriorityCounts);
+        setAppliedEvents(newAppliedEvents);
+      } else { 
+        setEvents(data.events.map(event => ({ 
+          ...event, 
+          backgroundColor: '#FFFFFF', 
+          textColor: '#000000', 
+          borderColor: '#d1d1d1' 
+        }))); 
+      } 
+
+      setScheduleInfo(data.schedule); 
+    } catch (error) { 
+      console.error('스케줄 로딩 에러:', error); 
+      alert('스케줄을 불러오는데 실패했습니다.'); 
+    } finally { 
+      setIsLoading(false); 
+    } 
+  }; 
+
+// 데이터 로드 부분 
+useEffect(() => { 
+  loadEvents(); 
+}, []);
 
     // 근무 신청 조건 확인 함수
     const validateScheduleApplications = () => {
@@ -79,7 +162,6 @@ export default function WriteSchedule() {
     const handleSaveSchedule = async () => {
       try {
           const validation = validateScheduleApplications();
-          
           if (!validation.isValid) {
               alert(validation.errors.join('\n'));
               return;
@@ -87,16 +169,14 @@ export default function WriteSchedule() {
   
           const sessionResponse = await fetch('/home/session');
           const sessionData = await sessionResponse.json();
-          
-          console.log('Session Data:', sessionData);
-          
+  
           if (!sessionData.userId) {
               throw new Error('세션 정보를 찾을 수 없습니다.');
           }
   
           const shiftRequests = Object.entries(appliedEvents).map(([eventId, priority]) => {
               const event = events.find(e => e.id === eventId);
-              const request = {
+              return {
                   start: event.start,
                   end: event.end,
                   lastShiftStart: event.start,
@@ -105,37 +185,31 @@ export default function WriteSchedule() {
                   description: `${priority} 신청`,
                   priority: parseInt(priority.charAt(0))
               };
-              
-              console.log('Shift Request Data:', request);
-              return request;
           });
-  
-          console.log('Final Shift Requests:', shiftRequests);
   
           const response = await fetch('/worker/events/apply', {
               method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ shiftRequests }),
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ shiftRequests })
           });
   
           if (!response.ok) {
-              const errorData = await response.json().catch(() => ({ 
-                  message: '서버 응답을 처리할 수 없습니다.' 
-              }));
-              console.error('Server response:', errorData);
+              const errorData = await response.json();
               throw new Error(errorData.message || '근무 신청 저장에 실패했습니다.');
           }
   
-          const result = await response.json();
           alert('스케줄 저장 완료!');
+  
+          // 저장 후 데이터 새로 불러오기
+          await loadEvents();
+  
           navigate('/worker/main');
       } catch (error) {
-          console.error('Save error:', error);
+          console.error('저장 중 오류:', error);
           alert(error.message);
       }
   };
+  
        
 
     // 저장 버튼 렌더링 함수
@@ -162,24 +236,13 @@ export default function WriteSchedule() {
   };
 
   const updateEventStatus = (eventId, priority = null) => {
-    // 이벤트 삭제 시
-    if (!priority) {
-      const oldPriority = appliedEvents[eventId];
-      if (oldPriority) {
-        setPriorityCounts(prev => ({
-          ...prev,
-          [oldPriority]: prev[oldPriority] - 1
-        }));
-      }
-    }
-
     setEvents(prevEvents =>
       prevEvents.map(event => {
         if (event.id === eventId) {
           const originalName = event.title.split(' (')[0];
           let backgroundColor;
           let textColor;
-          
+  
           switch(priority) {
             case '1순위':
               backgroundColor = '#023c52';
@@ -198,7 +261,7 @@ export default function WriteSchedule() {
               textColor = '#000000';
               break;
           }
-
+  
           return {
             ...event,
             backgroundColor,
@@ -210,17 +273,41 @@ export default function WriteSchedule() {
         return event;
       })
     );
-
-    if (priority) {
-      setAppliedEvents(prev => ({ ...prev, [eventId]: priority }));
-    } else {
-      setAppliedEvents(prev => {
-        const newState = { ...prev };
-        delete newState[eventId];
-        return newState;
-      });
-    }
+  
+    setAppliedEvents(prev => {
+      const updated = { ...prev };
+  
+      // 기존 우선순위 제거
+      if (!priority && updated[eventId]) {
+        const oldPriority = updated[eventId];
+        setPriorityCounts(prevCounts => ({
+          ...prevCounts,
+          [oldPriority]: prevCounts[oldPriority] - 1 // 카운트 감소
+        }));
+        delete updated[eventId];
+      }
+  
+      // 새로운 우선순위 추가
+      if (priority) {
+        const oldPriority = updated[eventId];
+        if (oldPriority) {
+          setPriorityCounts(prevCounts => ({
+            ...prevCounts,
+            [oldPriority]: prevCounts[oldPriority] - 1
+          }));
+        }
+  
+        updated[eventId] = priority;
+        setPriorityCounts(prevCounts => ({
+          ...prevCounts,
+          [priority]: prevCounts[priority] + 1
+        }));
+      }
+  
+      return updated;
+    });
   };
+  
 
   const openCancelPopup = (event) => {
     const popupWidth = 400;

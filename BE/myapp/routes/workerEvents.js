@@ -179,9 +179,16 @@ router.get('/worker/events/apply', async (req, res) => {
 
 // 근무 신청 조회
 router.get('/apply/:workerId', async (req, res) => {
-    const requests = await ShiftRequest.find({ workerId: req.params.workerId });
+  try {
+    const requests = await ShiftRequest.find({ 
+      workerId: req.params.workerId,
+      status: 'Pending'  // 대기 중인 신청만 가져옴
+    });
     res.json(requests);
+  } catch (error) {
+    console.error('신청 내역 조회 에러:', error);
+    res.status(500).json({ message: '서버 에러가 발생했습니다.' });
+  }
 });
-
 
 export default router;
