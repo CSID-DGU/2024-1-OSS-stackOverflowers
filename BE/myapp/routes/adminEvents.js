@@ -221,10 +221,10 @@ const selectWorkers = async (timeSlot, maxWorkers) => {
     });
 
     // 우선순위 가중치
-    const priorityWeights = { 1: 4, 2: 2, 3: 0 }; // 1순위: +4, 2순위: +2, 3순위: +0
+    const priorityWeights = { 1: 50, 2: 30, 3: 20 }; // 1순위: +50, 2순위: +30, 3순위: +20 가중치 변경
     const sortedRequests = requests
         .map(request => {
-            const hoursSinceLastShift = (new Date() - new Date(request.lastShiftEnd)) / (1000 * 60 * 60);
+            const hoursSinceLastShift = (new Date() - new Date(request.lastShiftEnd)) / (1000 * 60 * 60 * 24); //시간-> 일단위 변경
             // 우선순위에 따른 가중치 추가
             score += priorityWeights[request.priority];
 
