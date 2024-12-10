@@ -202,8 +202,6 @@ useEffect(() => {
   
           // 저장 후 데이터 새로 불러오기
           await loadEvents();
-  
-          navigate('/worker/main');
       } catch (error) {
           console.error('저장 중 오류:', error);
           alert(error.message);
