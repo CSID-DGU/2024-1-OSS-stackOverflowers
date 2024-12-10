@@ -525,10 +525,10 @@ useEffect(() => {
               plugins={[timeGridPlugin, interactionPlugin]}
               initialView="timeGridWeek"
               initialDate={new Date(scheduleInfo.startDate)}
-              validRange={{
-                start: new Date(scheduleInfo.startDate),
-                end: new Date(scheduleInfo.endDate)
-              }}
+              //validRange={{
+              // start: new Date(scheduleInfo.startDate),
+              // end: new Date(scheduleInfo.endDate)
+              //}}
               headerToolbar={{
                 left: '',
                 center: 'title',
