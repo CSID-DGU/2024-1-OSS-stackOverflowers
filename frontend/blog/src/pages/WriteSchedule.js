@@ -534,7 +534,7 @@ useEffect(() => {
               headerToolbar={{
                 left: '',
                 center: 'title',
-                right: 'saveButton'
+                right: 'prev,next,saveButton'
               }}
               customButtons={{
                 saveButton: renderSaveButton()
