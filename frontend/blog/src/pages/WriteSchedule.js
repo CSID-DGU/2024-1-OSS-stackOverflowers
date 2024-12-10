@@ -401,21 +401,21 @@ export default function WriteSchedule() {
 
   return (
     <>
-      <div className="schedule-write-container">
-        <header className="navbar">
-          <div className="logo_home">ShiftMate</div>
-          <nav>
-            <ul className="nav-links">
-              <li><button className="main-button" onClick={() => { window.location.href = '/worker/home'; }}>홈</button></li>
-              <li><button className="main-button" onClick={() => navigate('/worker/events/apply')}>근무표 신청</button></li>
-              <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
-            </ul>
-          </nav>
-          <div className="auth-buttons">
-            <button onClick={() => navigate('/home')}>로그아웃</button>
-          </div>
-        </header>
-        <h1>근무표 신청</h1>
+    <div className="schedule-write-container">
+      <header className="navbar">
+        <div className="logo_home">ShiftMate</div>
+        <nav>
+          <ul className="nav-links">
+            <li><button className="main-button" onClick={() => { window.location.href = '/worker/main'; }}>홈</button></li>
+            <li><button className="main-button" onClick={() => navigate('/worker/events/apply')}>근무표 신청</button></li>
+            <li><button className="main-button" onClick={() => navigate('/worker/events/all')}>근무표 조회</button></li>
+          </ul>
+        </nav>
+        <div className="auth-buttons">
+          <button onClick={() => navigate('/home')}>로그아웃</button>
+        </div>
+      </header>
+      <h1>근무표 신청</h1>
 
         <div className="write_main-content">
           <div className="priority_dropdown">

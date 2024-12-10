@@ -296,61 +296,60 @@ const selectWorkers = async (timeSlot, maxWorkers) => {
 //request? 
 //이벤트에 근무자들을 title이 아닌 workers에 id로 저장
 
-// 자동 근무자 선발 함수
+// 자동 근무자 선발 함수 - 수정됨
 async function autoSelectWorkers() {
     try {
         const now = new Date();
         
-        // deadline이 지난 Schedule 조회
+        // 수정: selectionStatus와 필드명 변경
         const expiredSchedules = await Schedule.find({
             deadline: { $lt: now },
-            status: 'PENDING' // 아직 처리되지 않은 스케줄
+            selectionStatus: 'Pending'  // 변경: status -> selectionStatus
         });
 
         console.log(`${expiredSchedules.length}개의 마감된 스케줄에 대해 근무자 선발을 시작합니다.`);
 
-        // 각 스케줄에 대해 처리
         for (const schedule of expiredSchedules) {
             try {
-                // 해당 스케줄의 모든 Event 조회
-                const events = await Event.find({
-                    start: { $gte: schedule.startDate },
-                    end: { $lte: schedule.endDate }
-                });
+                // 수정: events 필드 직접 참조
+                const events = schedule.events;
 
                 console.log(`스케줄 ID ${schedule._id}에 대한 ${events.length}개의 이벤트 처리 시작`);
 
                 // 각 Event에 대해 근무자 선발
-                for (const event of events) {
+                for (const eventId of events) {
+                    // 수정: Event 조회 방식 변경
+                    const event = await Event.findById(eventId);
+                    if (!event) continue;
+
                     const timeSlot = {
                         start: event.start,
                         end: event.end
                     };
 
-                    // 근무자 선발 알고리즘 실행
-                    const { selectedWorkers, rejectedWorkers } = await selectWorkers(timeSlot, schedule.maxWorkersPerShift);
+                    const { selectedWorkers, rejectedWorkers } = await selectWorkers(
+                        timeSlot, 
+                        schedule.maxWorkersPerShift  // 수정: maxWorkers -> maxWorkersPerShift
+                    );
 
-                    // Event 업데이트는 selectWorkers 함수 내에서 처리됨 (이미 구현되어 있음)
-                    
-                    // 로그 기록
                     console.log(`이벤트 처리 완료 (${event.start} ~ ${event.end}):`, {
                         selected: selectedWorkers.length,
                         rejected: rejectedWorkers.length
                     });
                 }
 
-                // 모든 이벤트 처리 완료 후 Schedule 상태 업데이트
+                // 수정: Schedule 상태 업데이트 필드명 변경
                 await Schedule.findByIdAndUpdate(schedule._id, {
-                    status: 'COMPLETED',
+                    selectionStatus: 'Completed',  // 변경: status -> selectionStatus
                     lastProcessed: new Date()
                 });
 
             } catch (error) {
                 console.error(`스케줄 ID ${schedule._id} 처리 중 오류:`, error);
                 
-                // 오류 발생 시 Schedule 상태 업데이트
+                // 수정: 에러 상태 업데이트 필드명 변경
                 await Schedule.findByIdAndUpdate(schedule._id, {
-                    status: 'ERROR',
+                    selectionStatus: 'Error',  // 변경: status -> selectionStatus
                     lastError: error.message,
                     lastProcessed: new Date()
                 });
@@ -368,20 +367,42 @@ cron.schedule('0 0 * * *', async () => {
 });
 
 
-// 수동 실행을 위한 API 엔드포인트 유지
+// 수동 실행 API - 수정됨
 router.post('/approve', async (req, res) => {
     try {
-        // timeSlot과 maxWorkers를 요청에서 받아옴
-        const { timeSlot, maxWorkers } = req.body;
+        const { scheduleId } = req.body;  // 변경: scheduleId를 받도록 수정
         
-        // 근무자 선발 알고리즘 실행
-        const { selectedWorkers, rejectedWorkers } = await selectWorkers(timeSlot, maxWorkers);
+        const schedule = await Schedule.findById(scheduleId);
+        if (!schedule) {
+            return res.status(404).json({ message: '스케줄을 찾을 수 없습니다.' });
+        }
 
-        // 결과를 클라이언트로 반환
+        const results = [];
+        for (const eventId of schedule.events) {
+            const event = await Event.findById(eventId);
+            if (!event) continue;
+
+            const timeSlot = {
+                start: event.start,
+                end: event.end
+            };
+
+            const result = await selectWorkers(timeSlot, schedule.maxWorkersPerShift);
+            results.push({
+                eventId: eventId,
+                ...result
+            });
+        }
+
+        // Schedule 상태 업데이트
+        await Schedule.findByIdAndUpdate(scheduleId, {
+            selectionStatus: 'Completed',
+            lastProcessed: new Date()
+        });
+
         res.status(200).json({
             message: '근무자 선발 완료',
-            selectedWorkers,
-            rejectedWorkers
+            results
         });
     } catch (error) {
         console.error('근무자 선발 오류:', error);
