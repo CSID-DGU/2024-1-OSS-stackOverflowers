@@ -112,20 +112,29 @@ export default function ModifySchedule() {
     };
   };
 
-  const handleSaveSchedule = () => {
-    // 현재 범위에 해당하는 근무표 업데이트
-    const updatedScheduleList = scheduleList.map((schedule) =>
-      new Date(schedule.startDate) <= new Date(currentRange.end) &&
-      new Date(schedule.endDate) >= new Date(currentRange.start)
-        ? { ...schedule, events }
-        : schedule
-    );
+  const handleSaveSchedule = async () => {
+    try {
+        const scheduleId = location.state?.scheduleId; // URL이나 state에서 스케줄 ID를 가져옴
+        const response = await fetch(`/events/edit/${scheduleId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ events }),
+        });
 
-    localStorage.setItem("scheduleData", JSON.stringify(updatedScheduleList));
-    setScheduleList(updatedScheduleList);
-    alert("근무표가 저장되었습니다.");
-    navigate("/admin/events/all");
-  };
+        if (!response.ok) {
+            throw new Error('스케줄 수정에 실패했습니다.');
+        }
+
+        const data = await response.json();
+        alert(data.message);
+        navigate("/admin/events/all");
+    } catch (error) {
+        console.error('스케줄 수정 중 오류 발생:', error);
+        alert('스케줄 수정에 실패했습니다.');
+    }
+};
 
   const renderSaveButton = () => {
     return {

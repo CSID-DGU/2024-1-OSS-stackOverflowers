@@ -137,6 +137,16 @@ export default function ViewSchedule_admin() {
             slotDuration="00:30:00"
             events={events}
             allDaySlot={false}
+            eventContent={(eventInfo) => {
+              return (
+                <>
+                  <div>{eventInfo.event.title}</div>
+                  {eventInfo.event.extendedProps.workers && (
+                    <div>근무자: {eventInfo.event.extendedProps.workers.join(', ')}</div>
+                  )}
+                </>
+              )
+            }}
           />
         </div>
       </div>
