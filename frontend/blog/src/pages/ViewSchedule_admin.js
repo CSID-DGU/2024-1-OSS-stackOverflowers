@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import './nav_schedule.css';
@@ -10,12 +10,62 @@ import './ModifySchedule.css'
 export default function ViewSchedule_admin() {
   const calendarEl = useRef(null);
   const navigate = useNavigate();
+  const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (calendarEl.current) {
-      const calendarApi = calendarEl.current.getApi();
-      console.log('Calendar API loaded:', calendarApi);
-    }
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/worker/events/all');
+        if (!response.ok) {
+          throw new Error('근무표 조회에 실패했습니다.');
+        }
+  
+        const data = await response.json();
+  
+        // 시간대별 가장 최신 이벤트를 저장하기 위한 배열
+        const uniqueEvents = [];
+  
+        // 배열을 뒤집어서 최신 이벤트부터 처리
+        data.reverse().forEach((event) => {
+          const eventStart = new Date(event.start).getTime();
+          const eventEnd = new Date(event.end).getTime();
+  
+          // 현재 이벤트와 겹치는 시간대의 이벤트가 이미 있는지 확인
+          const isOverlap = uniqueEvents.some(
+            (e) =>
+              eventStart < new Date(e.end).getTime() && eventEnd > new Date(e.start).getTime()
+          );
+  
+          // 겹치는 이벤트가 없을 경우에만 추가
+          if (!isOverlap) {
+            uniqueEvents.push({
+              id: event._id,
+              title: event.title,
+              start: event.start,
+              end: event.end,
+              backgroundColor: "#52b2d5",
+              description: event.description,
+              allDay: event.allDay || false,
+              extendedProps: {
+                workers: event.workers,
+              },
+            });
+          }
+        });
+  
+        setEvents(uniqueEvents);
+      } catch (error) {
+        console.error('근무표 조회 중 오류 발생:', error);
+        alert('근무표를 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    fetchEvents();
   }, []);
 
   const handlerender = () => {
@@ -35,12 +85,11 @@ export default function ViewSchedule_admin() {
     };
   };
 
-  const fetchEvents = (fetchInfo, successCallback, failureCallback) => {
+  /* const fetchEvents = (fetchInfo, successCallback, failureCallback) => {
     try {
       const events = eventsData.map(event => ({
-        title: `${event.worker}`,
-        start: event.startTime,
-        end: event.endTime,
+        title: event.title,
+        workers: event.workers,
         backgroundColor: "#52b2d5"
       }));
       
@@ -49,7 +98,7 @@ export default function ViewSchedule_admin() {
       console.error('Failed to load events:', error);
       failureCallback(error);
     }
-  };
+  }; */
 
   return (
     <>
@@ -86,7 +135,7 @@ export default function ViewSchedule_admin() {
             }}
             locale={koLocale}
             slotDuration="00:30:00"
-            events={fetchEvents}
+            events={events}
             allDaySlot={false}
           />
         </div>
