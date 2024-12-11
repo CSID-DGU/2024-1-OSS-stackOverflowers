@@ -3,7 +3,8 @@
     "@fullcalendar/common": "^5.11.5",
     "@fullcalendar/core": "^6.1.4",
     "@fullcalendar/daygrid": "^6.1.4",
-    "@fullcalendar/react": "^6.1.4"
+    "@fullcalendar/react": "^6.1.4",
+    "git": "file:"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",
@@ -16,7 +17,6 @@
   "directories": {
     "doc": "docs"
   },
-  
   "keywords": [],
   "author": "",
   "license": "ISC"

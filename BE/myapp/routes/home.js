@@ -137,11 +137,11 @@ router.post('/logout',checkSession, (req, res) => {
 router.get('/session', (req, res) => {
     console.log('세션 요청 받음:', req.session);
     
-    if (req.session && req.session.id) {  // userId 대신 id 사용
+    if (req.session && req.session.userId) {  // userId 대신 id 사용
       res.json({
-        userId: req.session.id,     // MongoDB의 id 필드와 매칭
+        userId: req.session.userId,     // MongoDB의 id 필드와 매칭
         userType: req.session.userType,
-        userName: req.session.name  // userName 대신 name 사용
+        userName: req.session.userName  // userName 대신 name 사용
       });
     } else {
       res.status(401).json({ 

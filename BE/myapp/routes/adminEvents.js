@@ -81,36 +81,65 @@ router.get('/edit/:id', async (req, res) => {
     }
 });
 
-// 이벤트 수정 (POST /events/edit/:id)
-router.post('/edit/:id', async (req, res) => {
-    const { title, start, end, description, allDay } = req.body; // 수정된 데이터 가져오기
-     // 시작 및 종료 시간을 Date 객체로 변환
-     const startDate = new Date(start);
-     const endDate = new Date(end);
- 
-     try {
-         const updatedEvent = await Event.findByIdAndUpdate(
-             req.params.id,
-             { 
-                 title, 
-                 start: startDate, 
-                 end: endDate, 
-                 description, 
-                 allDay 
-             },
-             { new: true } // 수정 후 업데이트된 데이터를 반환
-         );
- 
-         if (!updatedEvent) {
-             return res.status(404).json({ message: 'Event not found' });
-         }
-         console.log('Event updated successfully');
-         res.status(200).json({ message: 'Event updated successfully', event: updatedEvent });
-     } catch (error) {
-         console.error('Failed to update event:', error);
-         res.status(500).json({ message: 'Failed to update event' });
-     }
- });
+router.post('/apply', async (req, res) => {
+    try {
+        const { shiftRequests } = req.body;
+        const sessionUserId = req.session.userId;
+
+        // 1. Worker 찾기
+        const worker = await Worker.findById(sessionUserId);
+        if (!worker) {
+            return res.status(404).json({ message: '근무자 정보를 찾을 수 없습니다.' });
+        }
+
+        // 2. 이전 신청 내역 모두 삭제
+        await ShiftRequest.deleteMany({ workerId: worker._id });
+
+        // 3. 새로운 ShiftRequest 생성 및 저장
+        const requestsToSave = shiftRequests.map(request => {
+            if (!request.start || !request.end || !request.lastShiftStart || 
+                !request.lastShiftEnd || !request.priority) {
+                throw new Error('필수 필드가 누락되었습니다.');
+            }
+
+            return {
+                workerId: worker._id,
+                userName: worker.userName,
+                start: request.start,
+                end: request.end,
+                lastShiftStart: request.lastShiftStart,
+                lastShiftEnd: request.lastShiftEnd,
+                status: request.status || 'Pending',
+                description: request.description,
+                priority: request.priority
+            };
+        });
+
+        const savedRequests = await ShiftRequest.insertMany(requestsToSave);
+
+        res.status(201).json({ 
+            message: '근무 신청이 성공적으로 접수되었습니다.',
+            requests: savedRequests
+        });
+
+    } catch (error) {
+        console.error('Shift Request 생성 중 오류:', error);
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ 
+                message: '데이터 검증 실패',
+                error: error.message,
+                details: Object.keys(error.errors).map(key => ({
+                    field: key,
+                    message: error.errors[key].message
+                }))
+            });
+        }
+        res.status(500).json({ 
+            message: '근무 신청에 실패했습니다.',
+            error: error.message 
+        });
+    }
+});
 
 
 // 이벤트 삭제 (POST /events/delete/:id)
@@ -192,10 +221,10 @@ const selectWorkers = async (timeSlot, maxWorkers) => {
     });
 
     // 우선순위 가중치
-    const priorityWeights = { 1: 4, 2: 2, 3: 0 }; // 1순위: +4, 2순위: +2, 3순위: +0
+    const priorityWeights = { 1: 50, 2: 30, 3: 20 }; // 1순위: +50, 2순위: +30, 3순위: +20 가중치 변경
     const sortedRequests = requests
         .map(request => {
-            const hoursSinceLastShift = (new Date() - new Date(request.lastShiftEnd)) / (1000 * 60 * 60);
+            const hoursSinceLastShift = (new Date() - new Date(request.lastShiftEnd)) / (1000 * 60 * 60 * 24); //시간-> 일단위 변경
             // 우선순위에 따른 가중치 추가
             score += priorityWeights[request.priority];
 

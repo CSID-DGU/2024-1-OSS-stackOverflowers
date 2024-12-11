@@ -443,7 +443,7 @@
         }
       }
     },
-    "/worker/home": {
+    "/worker/main": {
       "get": {
         "tags": ["Worker API"],
         "description": "",
